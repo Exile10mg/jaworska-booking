@@ -76,6 +76,7 @@ button {
 .service-list-scroll {
   scrollbar-width: thin;
   scrollbar-color: rgba(140, 107, 74, 0.6) rgba(245, 231, 216, 0.6);
+  scrollbar-gutter: stable;
 }
 
 .service-list-scroll::-webkit-scrollbar {

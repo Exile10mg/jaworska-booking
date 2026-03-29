@@ -1045,11 +1045,11 @@ export default function Page() {
             </div>
           )}
 
-          <div className="flex flex-1 flex-col">
+          <div className="flex min-h-0 flex-1 flex-col">
 
           {step === 1 && (
             <div className="animate-step-enter flex h-full min-h-0 flex-col">
-              <div className="min-h-0 flex-1">
+              <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
                 {isServicesLoading ? (
                   <div className="space-y-2.5 pb-1 lg:grid lg:grid-cols-2 lg:gap-2.5 lg:space-y-0">
                     {Array.from({ length: 6 }).map((_, index) => (
@@ -1070,9 +1070,9 @@ export default function Page() {
                 ) : (
                   <div
                     className={cn(
-                      "pb-1",
+                      "min-h-0",
                       shouldScrollServices &&
-                        "service-list-scroll max-h-[min(58vh,38rem)] overflow-y-auto pr-2 lg:max-h-[calc(100%-5.75rem)] lg:pb-10",
+                        "service-list-scroll max-h-[min(58vh,38rem)] overflow-y-auto pr-3 pb-6 lg:max-h-none lg:flex-1",
                     )}
                   >
                     <div className="space-y-2.5 lg:grid lg:grid-cols-2 lg:gap-2.5 lg:space-y-0">
@@ -1148,7 +1148,7 @@ export default function Page() {
                   </div>
                 )}
               </div>
-              <div className="sticky bottom-0 mt-4 bg-[#fcfaf8] pt-3">
+              <div className="sticky bottom-0 z-10 mt-4 shrink-0 bg-[#fcfaf8] pt-3 md:static md:bottom-auto md:z-auto md:bg-transparent md:pt-0">
                 <button
                   type="button"
                   onClick={() => selectedServiceId && setStep(2)}
