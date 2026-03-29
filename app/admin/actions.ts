@@ -166,6 +166,67 @@ export async function updateBookingStatusAction(formData: FormData) {
   revalidatePath("/admin/rezerwacje");
 }
 
+export async function deleteBookingAction(
+  _prevState: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  await requireAuthenticatedAdmin();
+
+  const rawBookingId = formData.get("bookingId");
+  const bookingId = typeof rawBookingId === "string" ? rawBookingId : "";
+
+  if (!bookingId) {
+    return {
+      status: "error",
+      message: "Nie znaleziono rezerwacji do usunięcia.",
+    };
+  }
+
+  try {
+    const db = getDb();
+    const [deletedBooking] = await db
+      .delete(bookings)
+      .where(eq(bookings.id, bookingId))
+      .returning({
+        id: bookings.id,
+        appointmentDate: bookings.appointmentDate,
+        appointmentTime: bookings.appointmentTime,
+      });
+
+    if (!deletedBooking) {
+      return {
+        status: "error",
+        message: "Ta rezerwacja nie istnieje albo została już usunięta.",
+      };
+    }
+
+    await db
+      .insert(availabilitySlots)
+      .values({
+        slotDate: deletedBooking.appointmentDate,
+        slotTime: deletedBooking.appointmentTime,
+      })
+      .onConflictDoNothing();
+
+    revalidatePath("/admin");
+    revalidatePath("/admin/rezerwacje");
+    revalidatePath("/admin/terminarz");
+    revalidatePath("/");
+
+    return {
+      status: "success",
+      message: "Rezerwacja została usunięta.",
+    };
+  } catch (error) {
+    console.error("Delete booking action error:", error);
+
+    return {
+      status: "error",
+      message: "Nie udało się usunąć rezerwacji. Spróbuj ponownie.",
+    };
+  }
+}
+
 export async function updateServiceAction(
   _prevState: AdminActionState,
   formData: FormData,

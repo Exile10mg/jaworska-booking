@@ -4,6 +4,8 @@ import { updateBookingStatusAction } from "@/app/admin/actions";
 import { getDb } from "@/db/client";
 import { bookings } from "@/db/schema";
 
+import { DeleteBookingButton } from "./delete-booking-button";
+
 export const dynamic = "force-dynamic";
 
 const statusMeta = {
@@ -47,8 +49,12 @@ export default async function AdminBookingsPage() {
     .orderBy(desc(bookings.createdAt));
 
   const pendingCount = bookingRows.filter((row) => row.status === "pending").length;
-  const confirmedCount = bookingRows.filter((row) => row.status === "confirmed").length;
-  const cancelledCount = bookingRows.filter((row) => row.status === "cancelled").length;
+  const confirmedCount = bookingRows.filter(
+    (row) => row.status === "confirmed",
+  ).length;
+  const cancelledCount = bookingRows.filter(
+    (row) => row.status === "cancelled",
+  ).length;
 
   return (
     <section className="space-y-6">
@@ -189,6 +195,20 @@ export default async function AdminBookingsPage() {
                             </button>
                           </form>
                         ))}
+                      </div>
+
+                      <div className="mt-4 border-t border-stone-200 pt-4">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-400">
+                          Usuń rezerwację
+                        </p>
+                        <div className="mt-3">
+                          <DeleteBookingButton
+                            bookingId={booking.id}
+                            appointmentDate={booking.appointmentDate}
+                            appointmentTime={booking.appointmentTime}
+                            serviceName={booking.serviceName}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
