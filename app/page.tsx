@@ -748,26 +748,6 @@ export default function Page() {
     });
   }, []);
 
-  const centerSelectedDay = useCallback((behavior: ScrollBehavior = "smooth") => {
-    if (!daysScrollRef.current || !selectedDate) return;
-
-    const container = daysScrollRef.current;
-    const selectedElement = dayItemRefs.current[selectedDate];
-    if (!selectedElement) return;
-
-    const targetLeft =
-      selectedElement.offsetLeft -
-      container.clientWidth / 2 +
-      selectedElement.clientWidth / 2;
-    const maxScrollLeft = Math.max(0, container.scrollWidth - container.clientWidth);
-    const safeLeft = Math.min(Math.max(0, targetLeft), maxScrollLeft);
-
-    container.scrollTo({
-      left: safeLeft,
-      behavior,
-    });
-  }, [selectedDate]);
-
   function resetBooking() {
     const resetNow = new Date();
     const resetTodayKey = toDateKey(resetNow);
@@ -989,16 +969,6 @@ export default function Page() {
       window.removeEventListener("resize", handleResize);
     };
   }, [updateDaysScrollState]);
-
-  useEffect(() => {
-    if (step !== 2 || !selectedDate) return;
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        centerSelectedDay("auto");
-      });
-    });
-  }, [step, selectedDate, upcomingDays.length, centerSelectedDay]);
 
   useEffect(() => {
     updateTimeScrollState();
@@ -1516,11 +1486,7 @@ export default function Page() {
                           <span
                             className={cn(
                               "mt-2 h-0.5 w-6 rounded-full",
-                              isSelected
-                                ? "bg-white/80"
-                                : day.hasAvailability
-                                  ? "bg-emerald-500"
-                                  : "bg-red-400",
+                              day.hasAvailability ? "bg-emerald-500" : "bg-red-400",
                             )}
                           />
                         </button>
