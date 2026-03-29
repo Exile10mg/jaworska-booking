@@ -1083,7 +1083,7 @@ export default function Page() {
     <main className="min-h-[100dvh] bg-[#faf8f5] p-2 text-stone-900 sm:p-4 lg:flex lg:items-center lg:justify-center lg:p-8">
       <div
         className={cn(
-          "fixed inset-x-2 top-2 z-[70] transition-all duration-300 ease-out md:hidden",
+          "fixed left-1/2 top-2 z-[70] w-[calc(100%-1rem)] max-w-md -translate-x-1/2 transition-all duration-300 ease-out md:hidden",
           showMobileStickyCallButton
             ? "translate-y-0 opacity-100"
             : "-translate-y-4 opacity-0 pointer-events-none",
@@ -1091,7 +1091,7 @@ export default function Page() {
       >
         <a
           href={`tel:${CONTACT_PHONE_E164}`}
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-stone-900 px-4 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(31,26,23,0.18)] backdrop-blur transition hover:bg-black"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-stone-900 bg-stone-900 px-4 text-sm font-semibold text-white shadow-[0_16px_40px_rgba(166,130,95,0.14),_0_0_0_8px_rgba(252,250,248,0.92)] backdrop-blur-md transition hover:bg-black"
         >
           <Phone className="h-4 w-4 text-white" />
           Zadzwoń teraz
