@@ -2076,6 +2076,7 @@ export default function Page() {
                   disabled={isSubmitting}
                   className={bottomPrimaryButtonClass}
                 >
+                  {!isSubmitting && <Check className="h-4 w-4" />}
                   {isSubmitting ? "Zapisywanie..." : "Potwierdź rezerwację"}
                 </button>
               </div>
