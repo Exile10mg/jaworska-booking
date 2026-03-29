@@ -1,4 +1,5 @@
 import {
+  boolean,
   index,
   integer,
   pgEnum,
@@ -66,5 +67,29 @@ export const adminUsers = pgTable(
   (table) => [
     uniqueIndex("admin_users_email_unique").on(table.email),
     index("admin_users_created_at_idx").on(table.createdAt),
+  ],
+);
+
+export const services = pgTable(
+  "services",
+  {
+    id: varchar("id", { length: 120 }).primaryKey(),
+    name: text("name").notNull(),
+    description: text("description").notNull(),
+    price: integer("price").notNull(),
+    duration: integer("duration").notNull(),
+    isFixedPrice: boolean("is_fixed_price").notNull().default(false),
+    isActive: boolean("is_active").notNull().default(true),
+    sortOrder: integer("sort_order").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("services_active_sort_idx").on(table.isActive, table.sortOrder),
+    index("services_created_at_idx").on(table.createdAt),
   ],
 );

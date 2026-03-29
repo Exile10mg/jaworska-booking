@@ -15,6 +15,13 @@
       "when": 1774777607740,
       "tag": "0001_silent_tempest",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1774778492745,
+      "tag": "0002_wakeful_shiva",
+      "breakpoints": true
     }
   ]
 }

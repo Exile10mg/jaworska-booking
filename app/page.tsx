@@ -31,7 +31,6 @@ type Service = {
   price: number;
   duration: number;
   description: string;
-  badge?: string;
   isFixedPrice?: boolean;
 };
 
@@ -190,71 +189,6 @@ function SuccessStep({ serviceName, dateLabel, time, onReset }: SuccessStepProps
     </div>
   );
 }
-
-const services: Service[] = [
-  {
-    id: "regulacja-brwi",
-    name: "Regulacja brwi (pęseta/wosk)",
-    price: 35,
-    duration: 20,
-    description: "Precyzyjna regulacja pęsetą i woskiem dla idealnego kształtu.",
-  },
-  {
-    id: "henna-klasyczna-regulacja",
-    name: "Henna klasyczna + Regulacja",
-    price: 55,
-    duration: 35,
-    description: "Trwała koloryzacja klasyczną henną z precyzyjną regulacją.",
-  },
-  {
-    id: "henna-pudrowa-architektura-regulacja",
-    name: "Henna pudrowa + Architektura + Regulacja",
-    price: 85,
-    duration: 60,
-    description:
-      "Profesjonalna henna pudrowa z geometrią twarzy i regulacją. Najtrwalszy efekt.",
-  },
-  {
-    id: "laminacja-bez-henny",
-    name: "Laminacja brwi (bez henny) + Regulacja",
-    price: 100,
-    duration: 45,
-    description: "Ujarzmienie i ułożenie brwi w górę dla efektu uniesienia.",
-  },
-  {
-    id: "laminacja-farbka-regulacja",
-    name: "Laminacja brwi z koloryzacją (Farbka) + Regulacja",
-    price: 130,
-    duration: 60,
-    description: "Laminacja, farbowanie włosków i regulacja dla wyrazistego wyglądu.",
-  },
-  {
-    id: "laminacja-koloryzacja-botox",
-    name: "Laminacja brwi z koloryzacją + Botox",
-    price: 150,
-    duration: 75,
-    description:
-      "Zabieg premium: Laminacja, koloryzacja i regulacja z odżywczym botoksem.",
-    isFixedPrice: true,
-  },
-  {
-    id: "lifting-laminacja-rzes-koloryzacja",
-    name: "Lifting + Laminacja rzęs z koloryzacją",
-    price: 140,
-    duration: 60,
-    description:
-      "Trwałe podkręcenie, pogrubienie i przyciemnienie naturalnych rzęs. Efekt otwartego oka bez maskary.",
-    isFixedPrice: true,
-  },
-  {
-    id: "geometria-brwi-regulacja-nitka-wosk",
-    name: "Geometria brwi + Precyzyjna regulacja (Nitka/Wosk)",
-    price: 45,
-    duration: 30,
-    description:
-      "Wyznaczenie idealnego kształtu brwi za pomocą pomiarów twarzy oraz usunięcie zbędnych włosków. Bez koloryzacji.",
-  },
-];
 
 const timeSlots = Array.from({ length: (18 - 8) * 4 + 1 }, (_, index) => {
   const totalMinutes = 8 * 60 + index * 15;
@@ -430,6 +364,9 @@ export default function Page() {
   const isLoadingMoreDaysRef = useRef(false);
 
   const [step, setStep] = useState(1);
+  const [services, setServices] = useState<Service[]>([]);
+  const [servicesError, setServicesError] = useState<string | null>(null);
+  const [isServicesLoading, setIsServicesLoading] = useState(true);
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(todayKey);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
@@ -779,6 +716,52 @@ export default function Page() {
   }
 
   useEffect(() => {
+    let cancelled = false;
+
+    async function loadServices() {
+      try {
+        setIsServicesLoading(true);
+        setServicesError(null);
+
+        const response = await fetch("/api/services", {
+          cache: "no-store",
+        });
+
+        if (!response.ok) {
+          throw new Error("Nie udało się pobrać usług.");
+        }
+
+        const data = (await response.json()) as { services?: Service[] };
+
+        if (cancelled) return;
+
+        setServices(Array.isArray(data.services) ? data.services : []);
+      } catch (error) {
+        if (cancelled) return;
+        console.error(error);
+        setServices([]);
+        setServicesError("Nie udało się pobrać listy usług. Odśwież stronę.");
+      } finally {
+        if (!cancelled) {
+          setIsServicesLoading(false);
+        }
+      }
+    }
+
+    void loadServices();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (selectedServiceId && !services.some((service) => service.id === selectedServiceId)) {
+      setSelectedServiceId(null);
+    }
+  }, [selectedServiceId, services]);
+
+  useEffect(() => {
     if (isLegalAccepted) {
       setShowLegalError(false);
     }
@@ -1066,76 +1049,95 @@ export default function Page() {
           {step === 1 && (
             <div className="animate-step-enter flex h-full min-h-0 flex-col">
               <div className="min-h-0 flex-1 overflow-y-auto pr-1">
-                <div className="space-y-2.5 pb-1 lg:grid lg:grid-cols-2 lg:gap-2.5 lg:space-y-0">
-                  {services.map((service) => {
-                    const isSelected = service.id === selectedServiceId;
+                {isServicesLoading ? (
+                  <div className="space-y-2.5 pb-1 lg:grid lg:grid-cols-2 lg:gap-2.5 lg:space-y-0">
+                    {Array.from({ length: 6 }).map((_, index) => (
+                      <div
+                        key={index}
+                        className="h-[134px] animate-pulse rounded-[24px] border border-stone-200 bg-[linear-gradient(180deg,_#fffdfa_0%,_#fff8f2_100%)]"
+                      />
+                    ))}
+                  </div>
+                ) : servicesError ? (
+                  <div className="rounded-[24px] border border-red-200 bg-red-50 px-4 py-5 text-sm text-red-700">
+                    {servicesError}
+                  </div>
+                ) : services.length === 0 ? (
+                  <div className="rounded-[24px] border border-dashed border-stone-200 bg-stone-50 px-4 py-8 text-center text-sm text-stone-500">
+                    Brak aktywnych usług do rezerwacji.
+                  </div>
+                ) : (
+                  <div className="space-y-2.5 pb-1 lg:grid lg:grid-cols-2 lg:gap-2.5 lg:space-y-0">
+                    {services.map((service) => {
+                      const isSelected = service.id === selectedServiceId;
 
-                    return (
-                      <button
-                        key={service.id}
-                        type="button"
-                        onClick={() => handleSelectService(service.id)}
-                        className={cn(
-                          "group relative w-full overflow-hidden rounded-[24px] border p-3 text-left transition-colors duration-200 ease-in-out md:p-4 lg:h-full",
-                          isSelected &&
-                            "border-[#8c6b4a] bg-[#8c6b4a]/5",
-                          !isSelected &&
-                            "border-stone-200 bg-[linear-gradient(180deg,_#fffdfa_0%,_#fff8f2_100%)] md:hover:border-[#dcc0a4]",
-                        )}
-                      >
-                        <div className="pointer-events-none absolute inset-x-0 top-0 h-12 bg-[linear-gradient(180deg,_rgba(255,255,255,0.5),_rgba(255,255,255,0))]" />
-                        <div className="relative flex flex-col items-start justify-between gap-2.5 md:flex-row md:items-center md:gap-3">
-                          <div className="min-w-0 flex-1 pr-3">
-                            <h3 className="text-[13px] font-semibold leading-5 text-stone-900">
-                              {service.name}
-                            </h3>
-                            <p className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-stone-600 md:line-clamp-3">
-                              {service.description}
-                            </p>
-                          </div>
-                          <div
-                            className={cn(
-                              "shrink-0 flex h-12 w-full items-center justify-between rounded-xl border border-[#eadfd3] bg-white/65 px-4 py-2 md:w-28",
-                              isSelected && "border-[#ccb195] bg-[#fff5ea]",
-                            )}
-                          >
-                            <div className="leading-none">
-                              {!service.isFixedPrice && (
-                                <p className="text-[9px] tracking-[0.12em] text-stone-400">od</p>
-                              )}
-                              <p
-                                className={cn(
-                                  "text-sm font-semibold text-[#8f6742]",
-                                  service.isFixedPrice ? "" : "mt-1",
-                                )}
-                              >
-                                {service.price} zł
+                      return (
+                        <button
+                          key={service.id}
+                          type="button"
+                          onClick={() => handleSelectService(service.id)}
+                          className={cn(
+                            "group relative w-full overflow-hidden rounded-[24px] border p-3 text-left transition-colors duration-200 ease-in-out md:p-4 lg:h-full",
+                            isSelected &&
+                              "border-[#8c6b4a] bg-[#8c6b4a]/5",
+                            !isSelected &&
+                              "border-stone-200 bg-[linear-gradient(180deg,_#fffdfa_0%,_#fff8f2_100%)] md:hover:border-[#dcc0a4]",
+                          )}
+                        >
+                          <div className="pointer-events-none absolute inset-x-0 top-0 h-12 bg-[linear-gradient(180deg,_rgba(255,255,255,0.5),_rgba(255,255,255,0))]" />
+                          <div className="relative flex flex-col items-start justify-between gap-2.5 md:flex-row md:items-center md:gap-3">
+                            <div className="min-w-0 flex-1 pr-3">
+                              <h3 className="text-[13px] font-semibold leading-5 text-stone-900">
+                                {service.name}
+                              </h3>
+                              <p className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-stone-600 md:line-clamp-3">
+                                {service.description}
                               </p>
                             </div>
-                            <span
+                            <div
                               className={cn(
-                                "inline-flex h-5 w-5 items-center justify-center rounded-md border-2 transition-all duration-200 ease-in-out",
-                                isSelected
-                                  ? "border-stone-900 bg-stone-900 text-white"
-                                  : "border-[#e5e0d8] bg-transparent text-transparent",
+                                "shrink-0 flex h-12 w-full items-center justify-between rounded-xl border border-[#eadfd3] bg-white/65 px-4 py-2 md:w-28",
+                                isSelected && "border-[#ccb195] bg-[#fff5ea]",
                               )}
-                              aria-label={isSelected ? "Wybrano usługę" : "Wybierz usługę"}
                             >
-                              <Check className="h-3.5 w-3.5" />
+                              <div className="leading-none">
+                                {!service.isFixedPrice && (
+                                  <p className="text-[9px] tracking-[0.12em] text-stone-400">od</p>
+                                )}
+                                <p
+                                  className={cn(
+                                    "text-sm font-semibold text-[#8f6742]",
+                                    service.isFixedPrice ? "" : "mt-1",
+                                  )}
+                                >
+                                  {service.price} zł
+                                </p>
+                              </div>
+                              <span
+                                className={cn(
+                                  "inline-flex h-5 w-5 items-center justify-center rounded-md border-2 transition-all duration-200 ease-in-out",
+                                  isSelected
+                                    ? "border-stone-900 bg-stone-900 text-white"
+                                    : "border-[#e5e0d8] bg-transparent text-transparent",
+                                )}
+                                aria-label={isSelected ? "Wybrano usługę" : "Wybierz usługę"}
+                              >
+                                <Check className="h-3.5 w-3.5" />
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="relative mt-1.5 text-xs">
+                            <span className="inline-flex items-center gap-2 text-xs text-stone-400">
+                              <Clock3 className="h-3.5 w-3.5 text-[#b88659]" />
+                              Czas: {formatDuration(service.duration)}
                             </span>
                           </div>
-                        </div>
-
-                        <div className="relative mt-1.5 text-xs">
-                          <span className="inline-flex items-center gap-2 text-xs text-stone-400">
-                            <Clock3 className="h-3.5 w-3.5 text-[#b88659]" />
-                            Czas: {formatDuration(service.duration)}
-                          </span>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
               <div className="sticky bottom-0 mt-4 bg-[#fcfaf8] pt-3">
                 <button

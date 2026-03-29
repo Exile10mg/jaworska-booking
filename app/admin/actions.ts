@@ -6,7 +6,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { getDb } from "@/db/client";
-import { adminUsers, bookings, type BookingStatus } from "@/db/schema";
+import {
+  adminUsers,
+  bookings,
+  services,
+  type BookingStatus,
+} from "@/db/schema";
 import {
   clearAdminSession,
   createAdminSession,
@@ -18,6 +23,24 @@ const allowedBookingStatuses = new Set<BookingStatus>([
   "confirmed",
   "cancelled",
 ]);
+
+function slugifyServiceId(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 120);
+}
+
+function parseIntegerField(value: FormDataEntryValue | null) {
+  if (typeof value !== "string") return null;
+
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) ? parsed : null;
+}
 
 export async function loginAdminAction(
   _prevState: { error: string | null },
@@ -97,4 +120,90 @@ export async function updateBookingStatusAction(formData: FormData) {
     .where(eq(bookings.id, bookingId));
 
   revalidatePath("/admin");
+}
+
+export async function updateServiceAction(formData: FormData) {
+  await requireAuthenticatedAdmin();
+
+  const rawServiceId = formData.get("serviceId");
+  const rawName = formData.get("name");
+  const rawDescription = formData.get("description");
+  const serviceId = typeof rawServiceId === "string" ? rawServiceId : "";
+  const name = typeof rawName === "string" ? rawName.trim() : "";
+  const description =
+    typeof rawDescription === "string" ? rawDescription.trim() : "";
+  const price = parseIntegerField(formData.get("price"));
+  const duration = parseIntegerField(formData.get("duration"));
+  const sortOrder = parseIntegerField(formData.get("sortOrder")) ?? 0;
+  const isFixedPrice = formData.get("isFixedPrice") === "on";
+  const isActive = formData.get("isActive") === "on";
+
+  if (!serviceId || !name || !description || price === null || duration === null) {
+    return;
+  }
+
+  const db = getDb();
+  await db
+    .update(services)
+    .set({
+      name,
+      description,
+      price,
+      duration,
+      sortOrder,
+      isFixedPrice,
+      isActive,
+      updatedAt: new Date(),
+    })
+    .where(eq(services.id, serviceId));
+
+  revalidatePath("/admin");
+  revalidatePath("/");
+}
+
+export async function createServiceAction(formData: FormData) {
+  await requireAuthenticatedAdmin();
+
+  const rawCustomId = formData.get("newServiceId");
+  const rawName = formData.get("name");
+  const rawDescription = formData.get("description");
+  const customId = typeof rawCustomId === "string" ? rawCustomId : "";
+  const name = typeof rawName === "string" ? rawName.trim() : "";
+  const description =
+    typeof rawDescription === "string" ? rawDescription.trim() : "";
+  const price = parseIntegerField(formData.get("price"));
+  const duration = parseIntegerField(formData.get("duration"));
+  const sortOrder = parseIntegerField(formData.get("sortOrder")) ?? 0;
+  const isFixedPrice = formData.get("isFixedPrice") === "on";
+  const isActive = formData.get("isActive") === "on";
+  const serviceId = slugifyServiceId(customId || name);
+
+  if (!serviceId || !name || !description || price === null || duration === null) {
+    return;
+  }
+
+  const db = getDb();
+  const [existing] = await db
+    .select({ id: services.id })
+    .from(services)
+    .where(eq(services.id, serviceId))
+    .limit(1);
+
+  if (existing) {
+    return;
+  }
+
+  await db.insert(services).values({
+    id: serviceId,
+    name,
+    description,
+    price,
+    duration,
+    sortOrder,
+    isFixedPrice,
+    isActive,
+  });
+
+  revalidatePath("/admin");
+  revalidatePath("/");
 }
