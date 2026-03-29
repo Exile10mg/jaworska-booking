@@ -94,10 +94,10 @@ const phoneCountries: CountryOption[] = [
 ];
 
 const bottomSecondaryButtonClass =
-  "inline-flex h-14 min-w-[120px] shrink-0 items-center justify-center gap-2 rounded-2xl border border-stone-200 bg-white px-5 text-sm font-medium text-stone-700 transition-[transform,background-color,color] duration-200 ease-in-out hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-50 md:px-6 md:hover:scale-[1.01]";
+  "inline-flex h-14 min-w-[112px] shrink-0 items-center justify-center gap-2 rounded-2xl border border-stone-200 bg-white px-4 text-[13px] font-medium text-stone-700 transition-[transform,background-color,color] duration-200 ease-in-out hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-50 md:px-6 md:text-sm md:hover:scale-[1.01]";
 
 const bottomPrimaryButtonClass =
-  "flex h-14 w-full flex-1 items-center justify-center gap-2 rounded-2xl bg-stone-900 px-5 text-sm font-semibold text-white transition-[transform,background-color,color] duration-200 ease-in-out hover:bg-stone-800 disabled:cursor-not-allowed disabled:bg-stone-300 disabled:opacity-50 md:hover:scale-[1.01]";
+  "flex h-14 w-full flex-1 items-center justify-center gap-2 rounded-2xl bg-stone-900 px-4 text-[13px] font-semibold text-white transition-[transform,background-color,color] duration-200 ease-in-out hover:bg-stone-800 disabled:cursor-not-allowed disabled:bg-stone-300 disabled:opacity-50 md:px-5 md:text-sm md:hover:scale-[1.01]";
 
 function formatPhoneDigits(digits: string) {
   const cleanDigits = digits.replace(/\D/g, "").slice(0, 12);
