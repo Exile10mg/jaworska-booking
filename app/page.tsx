@@ -466,6 +466,8 @@ export default function Page() {
   const [visibleMonthLabel, setVisibleMonthLabel] = useState(() =>
     capitalize(monthYearFormatter.format(parseDateKey(todayKey))),
   );
+  const [showMobileStickyCallButton, setShowMobileStickyCallButton] =
+    useState(false);
 
   const selectedService =
     services.find((service) => service.id === selectedServiceId) ?? null;
@@ -1064,8 +1066,38 @@ export default function Page() {
     };
   }, [isCountryDropdownOpen, updateCountryDropdownPosition]);
 
+  useEffect(() => {
+    const handleScrollVisibility = () => {
+      setShowMobileStickyCallButton(window.scrollY > 140);
+    };
+
+    handleScrollVisibility();
+    window.addEventListener("scroll", handleScrollVisibility, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScrollVisibility);
+    };
+  }, []);
+
   return (
     <main className="min-h-[100dvh] bg-[#faf8f5] p-2 text-stone-900 sm:p-4 lg:flex lg:items-center lg:justify-center lg:p-8">
+      <div
+        className={cn(
+          "fixed inset-x-2 top-2 z-[70] transition-all duration-300 ease-out md:hidden",
+          showMobileStickyCallButton
+            ? "translate-y-0 opacity-100"
+            : "-translate-y-4 opacity-0 pointer-events-none",
+        )}
+      >
+        <a
+          href={`tel:${CONTACT_PHONE_E164}`}
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-stone-900 px-4 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(31,26,23,0.18)] backdrop-blur transition hover:bg-black"
+        >
+          <Phone className="h-4 w-4 text-white" />
+          Zadzwoń teraz
+        </a>
+      </div>
+
       <div className="mx-auto flex min-h-[100dvh] w-full max-w-md flex-col overflow-hidden rounded-[32px] border border-[#f2e3d3] bg-[#fcfaf8] shadow-[0_30px_90px_rgba(166,130,95,0.18)] backdrop-blur lg:min-h-0 lg:h-[85vh] lg:max-w-5xl">
         <section className="shrink-0 px-4 pb-3 pt-4 md:px-6 md:pb-3 md:pt-4">
           <div className="flex flex-col items-center gap-3 border-b border-[#e5e0d8] pb-4 md:flex-row md:items-start md:justify-between">
