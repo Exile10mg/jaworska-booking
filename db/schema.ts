@@ -1,10 +1,22 @@
-import { index, integer, pgEnum, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import {
+  index,
+  integer,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 
 export const bookingStatusEnum = pgEnum("booking_status", [
   "pending",
   "confirmed",
   "cancelled",
 ]);
+
+export type BookingStatus = (typeof bookingStatusEnum.enumValues)[number];
 
 export const paymentMethodEnum = pgEnum("payment_method", ["cash_on_site"]);
 
@@ -34,5 +46,25 @@ export const bookings = pgTable(
       table.appointmentTime,
     ),
     index("bookings_created_at_idx").on(table.createdAt),
+  ],
+);
+
+export const adminUsers = pgTable(
+  "admin_users",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    email: varchar("email", { length: 255 }).notNull(),
+    passwordHash: text("password_hash").notNull(),
+    displayName: text("display_name"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("admin_users_email_unique").on(table.email),
+    index("admin_users_created_at_idx").on(table.createdAt),
   ],
 );
