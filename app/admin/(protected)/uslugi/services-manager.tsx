@@ -21,9 +21,9 @@ import {
   updateServiceAction,
 } from "@/app/admin/actions";
 import {
-  initialServiceActionState,
-  type ServiceActionState,
-} from "@/app/admin/service-action-state";
+  initialAdminActionState,
+  type AdminActionState,
+} from "@/app/admin/action-state";
 
 type AdminService = {
   id: string;
@@ -36,7 +36,7 @@ type AdminService = {
   isActive: boolean;
 };
 
-function ActionNotice({ state }: { state: ServiceActionState }) {
+function ActionNotice({ state }: { state: AdminActionState }) {
   if (state.status === "idle" || !state.message) {
     return null;
   }
@@ -160,11 +160,11 @@ function DeleteButton() {
 function ServiceEditorCard({ service }: { service: AdminService }) {
   const [updateState, updateAction] = useActionState(
     updateServiceAction,
-    initialServiceActionState,
+    initialAdminActionState,
   );
   const [deleteState, deleteAction] = useActionState(
     deleteServiceAction,
-    initialServiceActionState,
+    initialAdminActionState,
   );
 
   return (
@@ -341,7 +341,7 @@ function ServiceEditorCard({ service }: { service: AdminService }) {
 function CreateServiceCard() {
   const [state, formAction] = useActionState(
     createServiceAction,
-    initialServiceActionState,
+    initialAdminActionState,
   );
   const formRef = useRef<HTMLFormElement>(null);
 

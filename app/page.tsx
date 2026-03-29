@@ -34,6 +34,8 @@ type Service = {
   isFixedPrice?: boolean;
 };
 
+type AvailabilityMap = Record<string, string[]>;
+
 type TimePeriod = "morning" | "afternoon" | "evening";
 type LegalModalContent = "regulamin" | "polityka" | null;
 type CountryOption = {
@@ -190,14 +192,6 @@ function SuccessStep({ serviceName, dateLabel, time, onReset }: SuccessStepProps
   );
 }
 
-const timeSlots = Array.from({ length: (18 - 8) * 4 + 1 }, (_, index) => {
-  const totalMinutes = 8 * 60 + index * 15;
-  const hours = String(Math.floor(totalMinutes / 60)).padStart(2, "0");
-  const minutes = String(totalMinutes % 60).padStart(2, "0");
-
-  return `${hours}:${minutes}`;
-});
-
 const weekDayFormatter = new Intl.DateTimeFormat("pl-PL", { weekday: "short" });
 const dayFormatter = new Intl.DateTimeFormat("pl-PL", { day: "2-digit" });
 const monthShortFormatter = new Intl.DateTimeFormat("pl-PL", { month: "short" });
@@ -246,25 +240,21 @@ function getTimeSlotsByPeriod(slots: string[], period: TimePeriod) {
 }
 
 function getDefaultTimePeriod(slots: string[]): TimePeriod {
+  if (slots.length === 0) return "morning";
   if (getTimeSlotsByPeriod(slots, "morning").length > 0) return "morning";
   if (getTimeSlotsByPeriod(slots, "afternoon").length > 0) return "afternoon";
   return "evening";
 }
 
-function getAvailableTimeSlots(dateKey: string, now = new Date()) {
-  const todayKey = toDateKey(now);
-  const nowMinutes = now.getHours() * 60 + now.getMinutes();
-
-  return timeSlots.filter((time) => {
-    if (dateKey === todayKey) {
-      return getMinutesFromTime(time) > nowMinutes;
-    }
-
-    return true;
-  });
+function getAvailableTimeSlots(dateKey: string, availability: AvailabilityMap) {
+  return availability[dateKey] ?? [];
 }
 
-function getUpcomingDaysFromToday(days = 14, now = new Date()) {
+function getUpcomingDaysFromToday(
+  days = 14,
+  availability: AvailabilityMap,
+  now = new Date(),
+) {
   const baseDate = new Date(now);
   baseDate.setHours(12, 0, 0, 0);
 
@@ -272,7 +262,7 @@ function getUpcomingDaysFromToday(days = 14, now = new Date()) {
     const date = new Date(baseDate);
     date.setDate(baseDate.getDate() + index);
     const key = toDateKey(date);
-    const totalSlots = getAvailableTimeSlots(key, now).length;
+    const totalSlots = getAvailableTimeSlots(key, availability).length;
 
     return {
       key,
@@ -367,11 +357,14 @@ export default function Page() {
   const [services, setServices] = useState<Service[]>([]);
   const [servicesError, setServicesError] = useState<string | null>(null);
   const [isServicesLoading, setIsServicesLoading] = useState(true);
+  const [availability, setAvailability] = useState<AvailabilityMap>({});
+  const [availabilityError, setAvailabilityError] = useState<string | null>(null);
+  const [isAvailabilityLoading, setIsAvailabilityLoading] = useState(true);
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(todayKey);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [selectedTimePeriod, setSelectedTimePeriod] = useState<TimePeriod>(
-    getDefaultTimePeriod(getAvailableTimeSlots(todayKey, now)),
+    getDefaultTimePeriod(getAvailableTimeSlots(todayKey, {})),
   );
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -402,7 +395,7 @@ export default function Page() {
 
   const selectedService =
     services.find((service) => service.id === selectedServiceId) ?? null;
-  const upcomingDays = getUpcomingDaysFromToday(visibleDaysCount, now);
+  const upcomingDays = getUpcomingDaysFromToday(visibleDaysCount, availability, now);
   const selectedDay =
     selectedDate === null
       ? null
@@ -411,7 +404,7 @@ export default function Page() {
           fullLabel: fullDateFormatter.format(parseDateKey(selectedDate)),
         };
   const availableTimeSlots = selectedDate
-    ? getAvailableTimeSlots(selectedDate, now)
+    ? getAvailableTimeSlots(selectedDate, availability)
     : [];
   const selectedCountry =
     phoneCountries.find((country) => country.iso === selectedCountryIso) ??
@@ -514,7 +507,7 @@ export default function Page() {
   }
 
   function handleSelectDate(dateKey: string) {
-    const slotsForDate = getAvailableTimeSlots(dateKey, new Date());
+    const slotsForDate = getAvailableTimeSlots(dateKey, availability);
     setSelectedDate(dateKey);
     setSelectedTime(null);
     setSelectedTimePeriod(getDefaultTimePeriod(slotsForDate));
@@ -696,7 +689,7 @@ export default function Page() {
   function resetBooking() {
     const resetNow = new Date();
     const resetTodayKey = toDateKey(resetNow);
-    const resetSlots = getAvailableTimeSlots(resetTodayKey, resetNow);
+    const resetSlots = getAvailableTimeSlots(resetTodayKey, availability);
 
     setStep(1);
     setSelectedServiceId(null);
@@ -757,10 +750,75 @@ export default function Page() {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+
+    async function loadAvailability() {
+      try {
+        setIsAvailabilityLoading(true);
+        setAvailabilityError(null);
+
+        const response = await fetch("/api/availability", {
+          cache: "no-store",
+        });
+
+        if (!response.ok) {
+          throw new Error("Nie udało się pobrać dostępności.");
+        }
+
+        const data = (await response.json()) as {
+          availability?: AvailabilityMap;
+        };
+
+        if (cancelled) return;
+
+        setAvailability(data.availability ?? {});
+      } catch (error) {
+        if (cancelled) return;
+        console.error(error);
+        setAvailability({});
+        setAvailabilityError(
+          "Nie udało się pobrać terminarza. Spróbuj odświeżyć stronę.",
+        );
+      } finally {
+        if (!cancelled) {
+          setIsAvailabilityLoading(false);
+        }
+      }
+    }
+
+    void loadAvailability();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
     if (selectedServiceId && !services.some((service) => service.id === selectedServiceId)) {
       setSelectedServiceId(null);
     }
   }, [selectedServiceId, services]);
+
+  useEffect(() => {
+    const slotsForSelectedDate = selectedDate
+      ? getAvailableTimeSlots(selectedDate, availability)
+      : [];
+
+    if (selectedTime && !slotsForSelectedDate.includes(selectedTime)) {
+      setSelectedTime(null);
+    }
+
+    if (slotsForSelectedDate.length === 0) {
+      if (selectedTimePeriod !== "morning") {
+        setSelectedTimePeriod("morning");
+      }
+      return;
+    }
+
+    if (getTimeSlotsByPeriod(slotsForSelectedDate, selectedTimePeriod).length === 0) {
+      setSelectedTimePeriod(getDefaultTimePeriod(slotsForSelectedDate));
+    }
+  }, [availability, selectedDate, selectedTime, selectedTimePeriod]);
 
   useEffect(() => {
     if (isLegalAccepted) {
@@ -1280,7 +1338,7 @@ export default function Page() {
                                 ? "bg-white/80"
                                 : day.hasAvailability
                                   ? "bg-emerald-500"
-                                  : "bg-stone-300",
+                                  : "bg-red-400",
                             )}
                           />
                         </button>
@@ -1320,7 +1378,15 @@ export default function Page() {
                   })}
                 </div>
 
-                {selectedDate ? (
+                {isAvailabilityLoading ? (
+                  <div className="flex h-10 items-center justify-center rounded-xl border border-dashed border-stone-300 bg-stone-50 px-3 text-center text-xs text-stone-500">
+                    Ładowanie terminarza...
+                  </div>
+                ) : availabilityError ? (
+                  <div className="flex min-h-10 items-center justify-center rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-center text-xs text-red-700">
+                    {availabilityError}
+                  </div>
+                ) : selectedDate ? (
                   filteredTimeSlots.length > 0 ? (
                     <>
                       <div className="flex items-center gap-2">
@@ -1397,7 +1463,9 @@ export default function Page() {
                     </>
                   ) : (
                     <div className="flex h-10 items-center justify-center rounded-xl border border-dashed border-stone-300 bg-stone-50 px-3 text-center text-xs text-stone-500">
-                      Brak wolnych godzin w tej porze dnia.
+                      {availableTimeSlots.length > 0
+                        ? "Brak wolnych godzin w tej porze dnia."
+                        : "Brak terminów w tym dniu."}
                     </div>
                   )
                 ) : (
@@ -1763,13 +1831,32 @@ export default function Page() {
                       });
 
                       if (!response.ok) {
-                        throw new Error("Nie udało się zapisać rezerwacji.");
+                        const payload = (await response.json().catch(() => null)) as
+                          | { error?: string }
+                          | null;
+                        throw new Error(
+                          payload?.error ?? "Nie udało się zapisać rezerwacji.",
+                        );
                       }
 
+                      setAvailability((current) => {
+                        const nextSlots = (current[selectedDate] ?? []).filter(
+                          (time) => time !== selectedTime,
+                        );
+
+                        return {
+                          ...current,
+                          [selectedDate]: nextSlots,
+                        };
+                      });
                       setIsBooked(true);
                     } catch (error) {
                       console.error(error);
-                      setSubmitError("Nie udało się zapisać rezerwacji. Spróbuj ponownie.");
+                      setSubmitError(
+                        error instanceof Error
+                          ? error.message
+                          : "Nie udało się zapisać rezerwacji. Spróbuj ponownie.",
+                      );
                     } finally {
                       setIsSubmitting(false);
                     }

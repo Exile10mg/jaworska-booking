@@ -1,13 +1,15 @@
 "use server";
 
 import { compare } from "bcryptjs";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { type AdminActionState } from "@/app/admin/action-state";
 import { getDb } from "@/db/client";
 import {
   adminUsers,
+  availabilitySlots,
   bookings,
   services,
   type BookingStatus,
@@ -17,7 +19,11 @@ import {
   createAdminSession,
 } from "@/lib/admin-session";
 import { requireAuthenticatedAdmin } from "@/lib/admin-auth";
-import { type ServiceActionState } from "@/app/admin/service-action-state";
+import {
+  buildSlotsFromRange,
+  normalizeDateKey,
+  normalizeTimeValue,
+} from "@/lib/availability";
 
 const allowedBookingStatuses = new Set<BookingStatus>([
   "pending",
@@ -161,9 +167,9 @@ export async function updateBookingStatusAction(formData: FormData) {
 }
 
 export async function updateServiceAction(
-  _prevState: ServiceActionState,
+  _prevState: AdminActionState,
   formData: FormData,
-): Promise<ServiceActionState> {
+): Promise<AdminActionState> {
   await requireAuthenticatedAdmin();
 
   const rawServiceId = formData.get("serviceId");
@@ -232,9 +238,9 @@ export async function updateServiceAction(
 }
 
 export async function createServiceAction(
-  _prevState: ServiceActionState,
+  _prevState: AdminActionState,
   formData: FormData,
-): Promise<ServiceActionState> {
+): Promise<AdminActionState> {
   await requireAuthenticatedAdmin();
 
   const rawCustomId = formData.get("newServiceId");
@@ -316,9 +322,9 @@ export async function createServiceAction(
 }
 
 export async function deleteServiceAction(
-  _prevState: ServiceActionState,
+  _prevState: AdminActionState,
   formData: FormData,
-): Promise<ServiceActionState> {
+): Promise<AdminActionState> {
   await requireAuthenticatedAdmin();
 
   const rawServiceId = formData.get("serviceId");
@@ -350,6 +356,171 @@ export async function deleteServiceAction(
     return {
       status: "error",
       message: "Nie udało się usunąć usługi. Spróbuj ponownie.",
+    };
+  }
+}
+
+export async function createAvailabilityWindowAction(
+  _prevState: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  await requireAuthenticatedAdmin();
+
+  const rawDate = formData.get("date");
+  const rawStartTime = formData.get("startTime");
+  const rawEndTime = formData.get("endTime");
+  const date =
+    typeof rawDate === "string" ? normalizeDateKey(rawDate) : null;
+  const startTime =
+    typeof rawStartTime === "string" ? normalizeTimeValue(rawStartTime) : null;
+  const endTime =
+    typeof rawEndTime === "string" ? normalizeTimeValue(rawEndTime) : null;
+  const intervalMinutes = parseIntegerField(formData.get("intervalMinutes"));
+
+  if (!date) {
+    return {
+      status: "error",
+      message: "Wybierz datę dostępności.",
+    };
+  }
+
+  if (!startTime || !endTime) {
+    return {
+      status: "error",
+      message: "Podaj poprawną godzinę rozpoczęcia i zakończenia.",
+    };
+  }
+
+  if (!intervalMinutes || intervalMinutes <= 0) {
+    return {
+      status: "error",
+      message: "Interwał musi być liczbą minut większą od 0.",
+    };
+  }
+
+  const slots = buildSlotsFromRange(startTime, endTime, intervalMinutes);
+
+  if (slots.length === 0) {
+    return {
+      status: "error",
+      message: "Zakres godzin jest nieprawidłowy.",
+    };
+  }
+
+  try {
+    const db = getDb();
+    await db
+      .insert(availabilitySlots)
+      .values(
+        slots.map((slotTime) => ({
+          slotDate: date,
+          slotTime,
+        })),
+      )
+      .onConflictDoNothing();
+
+    revalidatePath("/admin");
+    revalidatePath("/admin/terminarz");
+    revalidatePath("/");
+
+    return {
+      status: "success",
+      message: `Dodano ${slots.length} slot${slots.length === 1 ? "" : slots.length < 5 ? "y" : "ów"} dla dnia ${date}.`,
+    };
+  } catch (error) {
+    console.error("Create availability window action error:", error);
+
+    return {
+      status: "error",
+      message: "Nie udało się dodać dostępności. Spróbuj ponownie.",
+    };
+  }
+}
+
+export async function deleteAvailabilitySlotAction(
+  _prevState: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  await requireAuthenticatedAdmin();
+
+  const rawDate = formData.get("date");
+  const rawTime = formData.get("time");
+  const date =
+    typeof rawDate === "string" ? normalizeDateKey(rawDate) : null;
+  const time =
+    typeof rawTime === "string" ? normalizeTimeValue(rawTime) : null;
+
+  if (!date || !time) {
+    return {
+      status: "error",
+      message: "Nie znaleziono slotu do usunięcia.",
+    };
+  }
+
+  try {
+    const db = getDb();
+    await db
+      .delete(availabilitySlots)
+      .where(
+        and(
+          eq(availabilitySlots.slotDate, date),
+          eq(availabilitySlots.slotTime, time),
+        ),
+      );
+
+    revalidatePath("/admin");
+    revalidatePath("/admin/terminarz");
+    revalidatePath("/");
+
+    return {
+      status: "success",
+      message: `Usunięto slot ${time} z dnia ${date}.`,
+    };
+  } catch (error) {
+    console.error("Delete availability slot action error:", error);
+
+    return {
+      status: "error",
+      message: "Nie udało się usunąć slotu. Spróbuj ponownie.",
+    };
+  }
+}
+
+export async function deleteAvailabilityDayAction(
+  _prevState: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  await requireAuthenticatedAdmin();
+
+  const rawDate = formData.get("date");
+  const date =
+    typeof rawDate === "string" ? normalizeDateKey(rawDate) : null;
+
+  if (!date) {
+    return {
+      status: "error",
+      message: "Nie znaleziono dnia do usunięcia.",
+    };
+  }
+
+  try {
+    const db = getDb();
+    await db.delete(availabilitySlots).where(eq(availabilitySlots.slotDate, date));
+
+    revalidatePath("/admin");
+    revalidatePath("/admin/terminarz");
+    revalidatePath("/");
+
+    return {
+      status: "success",
+      message: `Usunięto wszystkie sloty z dnia ${date}.`,
+    };
+  } catch (error) {
+    console.error("Delete availability day action error:", error);
+
+    return {
+      status: "error",
+      message: "Nie udało się usunąć dnia z terminarza.",
     };
   }
 }

@@ -93,3 +93,26 @@ export const services = pgTable(
     index("services_created_at_idx").on(table.createdAt),
   ],
 );
+
+export const availabilitySlots = pgTable(
+  "availability_slots",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    slotDate: varchar("slot_date", { length: 10 }).notNull(),
+    slotTime: varchar("slot_time", { length: 5 }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("availability_slots_date_time_unique").on(
+      table.slotDate,
+      table.slotTime,
+    ),
+    index("availability_slots_date_idx").on(table.slotDate),
+    index("availability_slots_created_at_idx").on(table.createdAt),
+  ],
+);

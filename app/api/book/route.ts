@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { getDb } from "@/db/client";
 import { bookings } from "@/db/schema";
+import {
+  isSlotCurrentlyAvailable,
+  normalizeDateKey,
+  normalizeTimeValue,
+} from "@/lib/availability";
 
 type BookingPayload = {
   serviceId?: string;
@@ -20,18 +25,34 @@ export async function POST(request: NextRequest) {
     const normalizedName = body.name?.trim() ?? "";
     const normalizedPhone = body.phone?.trim() ?? "";
     const normalizedNotes = body.notes?.trim() ?? "";
+    const normalizedDate =
+      typeof body.date === "string" ? normalizeDateKey(body.date) : null;
+    const normalizedTime =
+      typeof body.time === "string" ? normalizeTimeValue(body.time) : null;
 
     if (
       !body.serviceId ||
       !body.serviceName ||
-      !body.date ||
-      !body.time ||
+      !normalizedDate ||
+      !normalizedTime ||
       !normalizedName ||
       !normalizedPhone
     ) {
       return NextResponse.json(
         { error: "Brakuje wymaganych danych rezerwacji." },
         { status: 400 },
+      );
+    }
+
+    const isAvailable = await isSlotCurrentlyAvailable(
+      normalizedDate,
+      normalizedTime,
+    );
+
+    if (!isAvailable) {
+      return NextResponse.json(
+        { error: "Wybrany termin nie jest już dostępny." },
+        { status: 409 },
       );
     }
 
@@ -42,8 +63,8 @@ export async function POST(request: NextRequest) {
         serviceId: body.serviceId,
         serviceName: body.serviceName.trim(),
         price: Number.isFinite(body.price) ? body.price : null,
-        appointmentDate: body.date,
-        appointmentTime: body.time,
+        appointmentDate: normalizedDate,
+        appointmentTime: normalizedTime,
         customerName: normalizedName,
         customerPhone: normalizedPhone,
         notes: normalizedNotes,

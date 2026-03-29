@@ -30,6 +30,14 @@ export function AdminNav() {
       >
         Usługi
       </Link>
+      <Link
+        href="/admin/terminarz"
+        className={`inline-flex h-11 items-center justify-center rounded-2xl border px-5 text-sm font-medium transition ${navClass(
+          pathname.startsWith("/admin/terminarz"),
+        )}`}
+      >
+        Terminarz
+      </Link>
     </nav>
   );
 }
