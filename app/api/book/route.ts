@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { getDb } from "@/db/client";
+import { bookings } from "@/db/schema";
+
 type BookingPayload = {
   serviceId?: string;
   serviceName?: string;
@@ -14,52 +17,76 @@ type BookingPayload = {
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as BookingPayload;
+    const normalizedName = body.name?.trim() ?? "";
+    const normalizedPhone = body.phone?.trim() ?? "";
+    const normalizedNotes = body.notes?.trim() ?? "";
 
     if (
       !body.serviceId ||
       !body.serviceName ||
       !body.date ||
       !body.time ||
-      !body.name ||
-      !body.phone
+      !normalizedName ||
+      !normalizedPhone
     ) {
       return NextResponse.json(
-        { error: "Missing required booking fields." },
+        { error: "Brakuje wymaganych danych rezerwacji." },
         { status: 400 },
       );
     }
 
-    const bookingRecord = {
-      id: crypto.randomUUID(),
-      serviceId: body.serviceId,
-      serviceName: body.serviceName,
-      price: body.price ?? null,
-      date: body.date,
-      time: body.time,
-      name: body.name,
-      phone: body.phone,
-      notes: body.notes ?? "",
-      createdAt: new Date().toISOString(),
-      paymentMethod: "cash_on_site",
-      status: "confirmed_mock",
-    };
+    const db = getDb();
+    const [bookingRecord] = await db
+      .insert(bookings)
+      .values({
+        serviceId: body.serviceId,
+        serviceName: body.serviceName.trim(),
+        price: Number.isFinite(body.price) ? body.price : null,
+        appointmentDate: body.date,
+        appointmentTime: body.time,
+        customerName: normalizedName,
+        customerPhone: normalizedPhone,
+        notes: normalizedNotes,
+        status: "pending",
+        paymentMethod: "cash_on_site",
+      })
+      .returning({
+        id: bookings.id,
+        serviceId: bookings.serviceId,
+        serviceName: bookings.serviceName,
+        price: bookings.price,
+        date: bookings.appointmentDate,
+        time: bookings.appointmentTime,
+        name: bookings.customerName,
+        phone: bookings.customerPhone,
+        notes: bookings.notes,
+        createdAt: bookings.createdAt,
+        paymentMethod: bookings.paymentMethod,
+        status: bookings.status,
+      });
 
-    // TODO: Save bookingRecord to the database.
-    // Example target: Prisma / Supabase / Neon / PostgreSQL.
-
-    // TODO: Send SMS notification to the salon owner via Twilio.
-    // TODO: Send confirmation SMS to the client via Twilio.
-
-    return NextResponse.json({
-      success: true,
-      booking: bookingRecord,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        booking: bookingRecord,
+      },
+      { status: 201 },
+    );
   } catch (error) {
     console.error("Booking API error:", error);
 
+    const isMissingDatabaseUrl =
+      error instanceof Error && error.message === "DATABASE_URL is not set.";
+
     return NextResponse.json(
-      { error: "Unexpected server error while creating booking." },
-      { status: 500 },
+      {
+        error: isMissingDatabaseUrl
+          ? "Brak konfiguracji połączenia z bazą danych."
+          : "Wystąpił błąd podczas zapisywania rezerwacji.",
+      },
+      {
+        status: 500,
+      },
     );
   }
 }

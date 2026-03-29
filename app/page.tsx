@@ -1736,9 +1736,9 @@ export default function Page() {
                           price: selectedService.price,
                           date: selectedDate,
                           time: selectedTime,
-                          name,
+                          name: name.trim(),
                           phone: formattedPhone,
-                          notes,
+                          notes: notes.trim(),
                         }),
                       });
 
