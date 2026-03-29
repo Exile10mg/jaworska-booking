@@ -29,6 +29,7 @@ import {
 import {
   sendBookingCancelledSms,
   sendBookingConfirmedSms,
+  sendBookingDeletedSms,
 } from "@/lib/sms-notifications";
 import {
   legalDocumentKeys,
@@ -504,7 +505,7 @@ export async function deleteBookingAction(
     }
 
     try {
-      await sendBookingCancelledSms({
+      await sendBookingDeletedSms({
         serviceName: deletedBooking.serviceName,
         appointmentDate: deletedBooking.appointmentDate,
         appointmentTime: deletedBooking.appointmentTime,

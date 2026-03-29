@@ -55,6 +55,10 @@ function buildBaseDetails({
   ];
 }
 
+function buildContactLine() {
+  return `Kontakt w sprawie rezerwacji: +48 ${CONTACT_PHONE_DISPLAY}.`;
+}
+
 async function sendSms(toPhone: string, body: string) {
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
   const authToken = process.env.TWILIO_AUTH_TOKEN;
@@ -94,8 +98,8 @@ async function sendSms(toPhone: string, body: string) {
 export async function sendBookingPendingSms(payload: BookingSmsPayload) {
   const body = [
     `Jaworska Beauty: Dziękujemy ${payload.customerName}!`,
-    "Twoja wizyta jest oczekująca i czeka na potwierdzenie.",
-    ...buildBaseDetails(payload),
+    "Twoja wizyta czeka na potwierdzenie.",
+    buildContactLine(),
   ].join(" ");
 
   await sendSms(payload.customerPhone, body);
@@ -113,7 +117,16 @@ export async function sendBookingConfirmedSms(payload: BookingSmsPayload) {
 export async function sendBookingCancelledSms(payload: BookingSmsPayload) {
   const body = [
     `Jaworska Beauty: ${payload.customerName}, Twoja wizyta została anulowana.`,
-    ...buildBaseDetails(payload),
+    buildContactLine(),
+  ].join(" ");
+
+  await sendSms(payload.customerPhone, body);
+}
+
+export async function sendBookingDeletedSms(payload: BookingSmsPayload) {
+  const body = [
+    `Jaworska Beauty: ${payload.customerName}, Twoja wizyta została usunięta z systemu.`,
+    buildContactLine(),
   ].join(" ");
 
   await sendSms(payload.customerPhone, body);
