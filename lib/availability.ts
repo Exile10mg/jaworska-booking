@@ -1,7 +1,7 @@
-import { and, asc, eq, gte, inArray } from "drizzle-orm";
+import { and, asc, eq, gte } from "drizzle-orm";
 
 import { getDb } from "@/db/client";
-import { availabilitySlots, bookings, type BookingStatus } from "@/db/schema";
+import { availabilitySlots } from "@/db/schema";
 
 export type AvailabilityMap = Record<string, string[]>;
 
@@ -10,7 +10,6 @@ export type AvailabilityDay = {
   slots: string[];
 };
 
-const activeBookingStatuses: BookingStatus[] = ["pending", "confirmed"];
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
 const timePattern = /^\d{2}:\d{2}$/;
 
@@ -99,40 +98,17 @@ export async function getAvailabilityMap({
   const todayKey = fromDate ?? toDateKey(new Date());
   try {
     const db = getDb();
-
-    const [slotRows, bookingRows] = await Promise.all([
-      db
-        .select({
-          date: availabilitySlots.slotDate,
-          time: availabilitySlots.slotTime,
-        })
-        .from(availabilitySlots)
-        .where(gte(availabilitySlots.slotDate, todayKey))
-        .orderBy(asc(availabilitySlots.slotDate), asc(availabilitySlots.slotTime)),
-      db
-        .select({
-          date: bookings.appointmentDate,
-          time: bookings.appointmentTime,
-        })
-        .from(bookings)
-        .where(
-          and(
-            gte(bookings.appointmentDate, todayKey),
-            inArray(bookings.status, activeBookingStatuses),
-          ),
-        ),
-    ]);
-
-    const blockedSlotTokens = new Set(
-      bookingRows.map((booking) => `${booking.date}::${booking.time}`),
-    );
+    const slotRows = await db
+      .select({
+        date: availabilitySlots.slotDate,
+        time: availabilitySlots.slotTime,
+      })
+      .from(availabilitySlots)
+      .where(gte(availabilitySlots.slotDate, todayKey))
+      .orderBy(asc(availabilitySlots.slotDate), asc(availabilitySlots.slotTime));
     const availabilityMap: AvailabilityMap = {};
 
     for (const slot of slotRows) {
-      if (blockedSlotTokens.has(`${slot.date}::${slot.time}`)) {
-        continue;
-      }
-
       if (!availabilityMap[slot.date]) {
         availabilityMap[slot.date] = [];
       }
@@ -186,31 +162,18 @@ export async function isSlotCurrentlyAvailable(date: string, time: string) {
   try {
     const db = getDb();
 
-    const [slotRow, conflictingBooking] = await Promise.all([
-      db
-        .select({ id: availabilitySlots.id })
-        .from(availabilitySlots)
-        .where(
-          and(
-            eq(availabilitySlots.slotDate, date),
-            eq(availabilitySlots.slotTime, time),
-          ),
-        )
-        .limit(1),
-      db
-        .select({ id: bookings.id })
-        .from(bookings)
-        .where(
-          and(
-            eq(bookings.appointmentDate, date),
-            eq(bookings.appointmentTime, time),
-            inArray(bookings.status, activeBookingStatuses),
-          ),
-        )
-        .limit(1),
-    ]);
+    const [slotRow] = await db
+      .select({ id: availabilitySlots.id })
+      .from(availabilitySlots)
+      .where(
+        and(
+          eq(availabilitySlots.slotDate, date),
+          eq(availabilitySlots.slotTime, time),
+        ),
+      )
+      .limit(1);
 
-    return Boolean(slotRow) && !conflictingBooking;
+    return Boolean(slotRow);
   } catch (error) {
     console.error("isSlotCurrentlyAvailable error:", error);
     return false;

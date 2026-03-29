@@ -1,12 +1,9 @@
+import { and, eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 import { getDb } from "@/db/client";
-import { bookings } from "@/db/schema";
-import {
-  isSlotCurrentlyAvailable,
-  normalizeDateKey,
-  normalizeTimeValue,
-} from "@/lib/availability";
+import { availabilitySlots, bookings } from "@/db/schema";
+import { normalizeDateKey, normalizeTimeValue } from "@/lib/availability";
 
 type BookingPayload = {
   serviceId?: string;
@@ -44,55 +41,73 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const isAvailable = await isSlotCurrentlyAvailable(
-      normalizedDate,
-      normalizedTime,
-    );
+    const db = getDb();
+    const [reservedSlot] = await db
+      .delete(availabilitySlots)
+      .where(
+        and(
+          eq(availabilitySlots.slotDate, normalizedDate),
+          eq(availabilitySlots.slotTime, normalizedTime),
+        ),
+      )
+      .returning({
+        id: availabilitySlots.id,
+        date: availabilitySlots.slotDate,
+        time: availabilitySlots.slotTime,
+      });
 
-    if (!isAvailable) {
+    if (!reservedSlot) {
       return NextResponse.json(
         { error: "Wybrany termin nie jest już dostępny." },
         { status: 409 },
       );
     }
 
-    const db = getDb();
-    const [bookingRecord] = await db
-      .insert(bookings)
-      .values({
-        serviceId: body.serviceId,
-        serviceName: body.serviceName.trim(),
-        price: Number.isFinite(body.price) ? body.price : null,
-        appointmentDate: normalizedDate,
-        appointmentTime: normalizedTime,
-        customerName: normalizedName,
-        customerPhone: normalizedPhone,
-        notes: normalizedNotes,
-        status: "pending",
-        paymentMethod: "cash_on_site",
-      })
-      .returning({
-        id: bookings.id,
-        serviceId: bookings.serviceId,
-        serviceName: bookings.serviceName,
-        price: bookings.price,
-        date: bookings.appointmentDate,
-        time: bookings.appointmentTime,
-        name: bookings.customerName,
-        phone: bookings.customerPhone,
-        notes: bookings.notes,
-        createdAt: bookings.createdAt,
-        paymentMethod: bookings.paymentMethod,
-        status: bookings.status,
+    try {
+      const [bookingRecord] = await db
+        .insert(bookings)
+        .values({
+          serviceId: body.serviceId,
+          serviceName: body.serviceName.trim(),
+          price: Number.isFinite(body.price) ? body.price : null,
+          appointmentDate: normalizedDate,
+          appointmentTime: normalizedTime,
+          customerName: normalizedName,
+          customerPhone: normalizedPhone,
+          notes: normalizedNotes,
+          status: "pending",
+          paymentMethod: "cash_on_site",
+        })
+        .returning({
+          id: bookings.id,
+          serviceId: bookings.serviceId,
+          serviceName: bookings.serviceName,
+          price: bookings.price,
+          date: bookings.appointmentDate,
+          time: bookings.appointmentTime,
+          name: bookings.customerName,
+          phone: bookings.customerPhone,
+          notes: bookings.notes,
+          createdAt: bookings.createdAt,
+          paymentMethod: bookings.paymentMethod,
+          status: bookings.status,
+        });
+
+      return NextResponse.json(
+        {
+          success: true,
+          booking: bookingRecord,
+        },
+        { status: 201 },
+      );
+    } catch (error) {
+      await db.insert(availabilitySlots).values({
+        slotDate: reservedSlot.date,
+        slotTime: reservedSlot.time,
       });
 
-    return NextResponse.json(
-      {
-        success: true,
-        booking: bookingRecord,
-      },
-      { status: 201 },
-    );
+      throw error;
+    }
   } catch (error) {
     console.error("Booking API error:", error);
 
