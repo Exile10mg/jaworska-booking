@@ -30,6 +30,7 @@ import {
   sendBookingCancelledSms,
   sendBookingConfirmedSms,
   sendBookingDeletedSms,
+  sendBookingRescheduledSms,
 } from "@/lib/sms-notifications";
 import {
   legalDocumentKeys,
@@ -420,6 +421,21 @@ export async function updateBookingDetailsAction(
           slotTime: currentBooking.appointmentTime,
         })
         .onConflictDoNothing();
+    }
+
+    if (slotChanged && currentBooking.status !== "cancelled") {
+      try {
+        await sendBookingRescheduledSms({
+          serviceName: selectedService.name,
+          appointmentDate,
+          appointmentTime,
+          customerName,
+          customerPhone,
+          price: selectedService.price,
+        });
+      } catch (notificationError) {
+        console.error("Booking reschedule SMS notification error:", notificationError);
+      }
     }
 
     revalidatePath("/admin");

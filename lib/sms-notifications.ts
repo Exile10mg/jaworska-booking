@@ -133,6 +133,15 @@ export async function sendBookingDeletedSms(payload: BookingSmsPayload) {
   await sendSms(payload.customerPhone, body);
 }
 
+export async function sendBookingRescheduledSms(payload: BookingSmsPayload) {
+  const body = [
+    `Jaworska Beauty: ${payload.customerName}, termin Twojej wizyty został zmieniony.`,
+    ...buildBaseDetails(payload),
+  ].join(" ");
+
+  await sendSms(payload.customerPhone, body);
+}
+
 export async function sendAdminNewBookingSms(payload: BookingSmsPayload) {
   const notesLine = payload.customerPhone
     ? `Telefon klientki: ${payload.customerPhone}.`
