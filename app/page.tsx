@@ -235,25 +235,6 @@ function ServiceCardSkeleton({ index }: { index: number }) {
 function ServicesLoadingState() {
   return (
     <div className="animate-step-enter space-y-3 pb-1">
-      <div className="loading-sheen overflow-hidden rounded-[24px] border border-[#ead8c6] bg-[linear-gradient(135deg,_#fffaf5_0%,_#fff5ea_55%,_#fffaf5_100%)] p-4">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8c6b4a]">
-          Aktualizujemy ofertę
-        </p>
-        <div className="mt-2 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#8c6b4a]/10 text-[#8c6b4a]">
-            <Sparkles className="h-5 w-5 animate-[pulse_2.2s_ease-in-out_infinite]" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-stone-900">
-              Ładujemy usługi z bazy danych
-            </p>
-            <p className="mt-0.5 text-xs leading-5 text-stone-600">
-              Zaraz pokażemy aktualny cennik i dostępne zabiegi.
-            </p>
-          </div>
-        </div>
-      </div>
-
       <div className="space-y-2.5 pb-1 lg:grid lg:grid-cols-2 lg:gap-2.5 lg:space-y-0">
         {Array.from({ length: 6 }).map((_, index) => (
           <ServiceCardSkeleton key={index} index={index} />
