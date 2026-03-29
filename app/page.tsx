@@ -72,6 +72,11 @@ type BookedSummary = {
   time: string;
 };
 
+type NotificationState = {
+  message: string;
+  tone: "error" | "success";
+};
+
 const SERVICES_LOADING_MIN_DURATION_MS = 2400;
 
 const phoneCountries: CountryOption[] = [
@@ -91,7 +96,7 @@ const bottomSecondaryButtonClass =
   "inline-flex h-14 min-w-[120px] shrink-0 items-center justify-center gap-2 rounded-2xl border border-stone-200 bg-white px-5 text-sm font-medium text-stone-700 transition-[transform,background-color,color] duration-200 ease-in-out hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-50 md:px-6 md:hover:scale-[1.01]";
 
 const bottomPrimaryButtonClass =
-  "flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-stone-900 px-5 text-sm font-semibold text-white transition-[transform,background-color,color] duration-200 ease-in-out hover:bg-stone-800 disabled:cursor-not-allowed disabled:bg-stone-300 disabled:opacity-50 md:hover:scale-[1.01]";
+  "flex h-14 w-full flex-1 items-center justify-center gap-2 rounded-2xl bg-stone-900 px-5 text-sm font-semibold text-white transition-[transform,background-color,color] duration-200 ease-in-out hover:bg-stone-800 disabled:cursor-not-allowed disabled:bg-stone-300 disabled:opacity-50 md:hover:scale-[1.01]";
 
 function formatPhoneDigits(digits: string) {
   const cleanDigits = digits.replace(/\D/g, "").slice(0, 12);
@@ -217,22 +222,26 @@ function ServiceCardSkeleton({ index }: { index: number }) {
       style={{ animationDelay: `${index * 60}ms` }}
       aria-hidden="true"
     >
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-12 bg-[linear-gradient(180deg,_rgba(255,255,255,0.5),_rgba(255,255,255,0))]" />
       <div className="flex flex-col items-start justify-between gap-2.5 md:flex-row md:items-center md:gap-3 lg:gap-2">
         <div className="min-w-0 flex-1 pr-3 lg:pr-2">
-          <div className="skeleton-block h-4 w-4/5 rounded-full" />
-          <div className="mt-2 skeleton-block h-3 w-full rounded-full" />
-          <div className="mt-1.5 skeleton-block h-3 w-2/3 rounded-full" />
+          <div className="skeleton-block h-4 w-[68%] rounded-full" />
+          <div className="mt-2 skeleton-block h-3 w-[84%] rounded-full" />
+          <div className="mt-1.5 skeleton-block h-3 w-[47%] rounded-full" />
         </div>
 
-        <div className="w-full shrink-0 rounded-xl border border-[#eadfd3] bg-white/80 px-4 py-2 md:w-28 lg:h-11 lg:w-24 lg:px-3">
-          <div className="skeleton-block h-2 w-6 rounded-full" />
-          <div className="mt-2 skeleton-block h-4 w-14 rounded-full" />
+        <div className="flex h-12 w-full shrink-0 items-center justify-between rounded-xl border border-[#eadfd3] bg-white/65 px-4 py-2 md:w-28 lg:h-11 lg:w-24 lg:px-3">
+          <div className="leading-none">
+            <div className="skeleton-block h-2 w-5 rounded-full" />
+            <div className="mt-2 skeleton-block h-4 w-12 rounded-full" />
+          </div>
+          <div className="skeleton-block h-5 w-5 rounded-md lg:h-[18px] lg:w-[18px]" />
         </div>
       </div>
 
-      <div className="mt-3 flex items-center gap-2">
+      <div className="mt-1.5 flex items-center gap-2 text-xs lg:mt-1">
         <div className="skeleton-block h-3.5 w-3.5 rounded-full" />
-        <div className="skeleton-block h-3 w-20 rounded-full" />
+        <div className="skeleton-block h-3 w-16 rounded-full" />
       </div>
     </div>
   );
@@ -439,6 +448,7 @@ export default function Page() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isLegalAccepted, setIsLegalAccepted] = useState(false);
   const [showLegalError, setShowLegalError] = useState(false);
+  const [notification, setNotification] = useState<NotificationState | null>(null);
   const [legalModalContent, setLegalModalContent] =
     useState<LegalModalContent>(null);
   const [legalDocuments, setLegalDocuments] =
@@ -1049,8 +1059,41 @@ export default function Page() {
     };
   }, [isCountryDropdownOpen, updateCountryDropdownPosition]);
 
+  useEffect(() => {
+    if (!notification) return;
+
+    const timeoutId = window.setTimeout(() => {
+      setNotification(null);
+    }, 3200);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [notification]);
+
   return (
     <main className="min-h-[100dvh] bg-[#faf8f5] p-2 text-stone-900 sm:p-4 lg:flex lg:items-center lg:justify-center lg:p-8">
+      {notification && (
+        <div className="pointer-events-none fixed inset-x-3 top-3 z-[90] flex justify-center md:inset-x-auto md:right-6 md:top-6">
+          <div
+            role="status"
+            aria-live="polite"
+            className={cn(
+              "pointer-events-auto flex max-w-md items-start gap-3 rounded-2xl border px-4 py-3 text-sm shadow-[0_20px_45px_rgba(31,24,19,0.14)] backdrop-blur",
+              notification.tone === "error"
+                ? "border-red-200 bg-[#fff7f6] text-red-700"
+                : "border-emerald-200 bg-[#f5fff8] text-emerald-700",
+            )}
+          >
+            <div
+              className={cn(
+                "mt-0.5 h-2.5 w-2.5 shrink-0 rounded-full",
+                notification.tone === "error" ? "bg-red-500" : "bg-emerald-500",
+              )}
+            />
+            <p className="leading-5">{notification.message}</p>
+          </div>
+        </div>
+      )}
+
       <div className="mx-auto flex min-h-[100dvh] w-full max-w-md flex-col overflow-hidden rounded-[32px] border border-[#f2e3d3] bg-[#fcfaf8] shadow-[0_30px_90px_rgba(166,130,95,0.18)] backdrop-blur lg:min-h-0 lg:h-[85vh] lg:max-w-5xl">
         <section className="shrink-0 px-4 pb-3 pt-4 md:px-6 md:pb-3 md:pt-4">
           <div className="flex flex-col items-center gap-3 border-b border-[#e5e0d8] pb-4 md:flex-row md:items-start md:justify-between">
@@ -1766,6 +1809,7 @@ export default function Page() {
                       setIsLegalAccepted(event.target.checked);
                       if (event.target.checked) {
                         setShowLegalError(false);
+                        setNotification(null);
                       }
                     }}
                     className={cn(
@@ -1796,11 +1840,6 @@ export default function Page() {
                     rezerwacji.
                   </p>
                 </div>
-                {showLegalError && !isLegalAccepted && (
-                  <p className="mt-2 pl-10 text-xs font-medium text-red-600">
-                    Aby przejść dalej, zaakceptuj Regulamin i Politykę Prywatności.
-                  </p>
-                )}
               </div>
 
               <div className="mt-auto flex gap-3 pt-4 md:pt-5 lg:mb-1">
@@ -1819,6 +1858,11 @@ export default function Page() {
                     if (!contactReady) return;
                     if (!isLegalAccepted) {
                       setShowLegalError(true);
+                      setNotification({
+                        message:
+                          "Aby przejść dalej, zaakceptuj Regulamin i Politykę Prywatności.",
+                        tone: "error",
+                      });
                       return;
                     }
                     setShowLegalError(false);
