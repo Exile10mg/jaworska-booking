@@ -17,6 +17,7 @@ import {
   createAdminSession,
 } from "@/lib/admin-session";
 import { requireAuthenticatedAdmin } from "@/lib/admin-auth";
+import { type ServiceActionState } from "@/app/admin/service-action-state";
 
 const allowedBookingStatuses = new Set<BookingStatus>([
   "pending",
@@ -40,6 +41,42 @@ function parseIntegerField(value: FormDataEntryValue | null) {
 
   const parsed = Number.parseInt(value, 10);
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+function validateServiceFields({
+  serviceId,
+  name,
+  description,
+  price,
+  duration,
+}: {
+  serviceId: string;
+  name: string;
+  description: string;
+  price: number | null;
+  duration: number | null;
+}): string | null {
+  if (!serviceId) {
+    return "Brak identyfikatora usługi.";
+  }
+
+  if (!name) {
+    return "Podaj nazwę usługi.";
+  }
+
+  if (!description) {
+    return "Dodaj krótki opis usługi.";
+  }
+
+  if (price === null || price < 0) {
+    return "Cena musi być liczbą równą lub większą od 0.";
+  }
+
+  if (duration === null || duration <= 0) {
+    return "Czas trwania musi być liczbą minut większą od 0.";
+  }
+
+  return null;
 }
 
 export async function loginAdminAction(
@@ -123,7 +160,10 @@ export async function updateBookingStatusAction(formData: FormData) {
   revalidatePath("/admin/rezerwacje");
 }
 
-export async function updateServiceAction(formData: FormData) {
+export async function updateServiceAction(
+  _prevState: ServiceActionState,
+  formData: FormData,
+): Promise<ServiceActionState> {
   await requireAuthenticatedAdmin();
 
   const rawServiceId = formData.get("serviceId");
@@ -139,31 +179,62 @@ export async function updateServiceAction(formData: FormData) {
   const isFixedPrice = formData.get("isFixedPrice") === "on";
   const isActive = formData.get("isActive") === "on";
 
-  if (!serviceId || !name || !description || price === null || duration === null) {
-    return;
+  const validationError = validateServiceFields({
+    serviceId,
+    name,
+    description,
+    price,
+    duration,
+  });
+
+  if (validationError) {
+    return {
+      status: "error",
+      message: validationError,
+    };
   }
 
-  const db = getDb();
-  await db
-    .update(services)
-    .set({
-      name,
-      description,
-      price,
-      duration,
-      sortOrder,
-      isFixedPrice,
-      isActive,
-      updatedAt: new Date(),
-    })
-    .where(eq(services.id, serviceId));
+  const validatedPrice = price as number;
+  const validatedDuration = duration as number;
 
-  revalidatePath("/admin");
-  revalidatePath("/admin/uslugi");
-  revalidatePath("/");
+  try {
+    const db = getDb();
+    await db
+      .update(services)
+      .set({
+        name,
+        description,
+        price: validatedPrice,
+        duration: validatedDuration,
+        sortOrder,
+        isFixedPrice,
+        isActive,
+        updatedAt: new Date(),
+      })
+      .where(eq(services.id, serviceId));
+
+    revalidatePath("/admin");
+    revalidatePath("/admin/uslugi");
+    revalidatePath("/");
+
+    return {
+      status: "success",
+      message: "Zmiany w usłudze zostały zapisane.",
+    };
+  } catch (error) {
+    console.error("Update service action error:", error);
+
+    return {
+      status: "error",
+      message: "Nie udało się zapisać zmian. Spróbuj ponownie.",
+    };
+  }
 }
 
-export async function createServiceAction(formData: FormData) {
+export async function createServiceAction(
+  _prevState: ServiceActionState,
+  formData: FormData,
+): Promise<ServiceActionState> {
   await requireAuthenticatedAdmin();
 
   const rawCustomId = formData.get("newServiceId");
@@ -180,53 +251,105 @@ export async function createServiceAction(formData: FormData) {
   const isActive = formData.get("isActive") === "on";
   const serviceId = slugifyServiceId(customId || name);
 
-  if (!serviceId || !name || !description || price === null || duration === null) {
-    return;
-  }
-
-  const db = getDb();
-  const [existing] = await db
-    .select({ id: services.id })
-    .from(services)
-    .where(eq(services.id, serviceId))
-    .limit(1);
-
-  if (existing) {
-    return;
-  }
-
-  await db.insert(services).values({
-    id: serviceId,
+  const validationError = validateServiceFields({
+    serviceId,
     name,
     description,
     price,
     duration,
-    sortOrder,
-    isFixedPrice,
-    isActive,
   });
 
-  revalidatePath("/admin");
-  revalidatePath("/admin/uslugi");
-  revalidatePath("/admin/rezerwacje");
-  revalidatePath("/");
+  if (validationError) {
+    return {
+      status: "error",
+      message: validationError,
+    };
+  }
+
+  const validatedPrice = price as number;
+  const validatedDuration = duration as number;
+
+  try {
+    const db = getDb();
+    const [existing] = await db
+      .select({ id: services.id })
+      .from(services)
+      .where(eq(services.id, serviceId))
+      .limit(1);
+
+    if (existing) {
+      return {
+        status: "error",
+        message:
+          "Usługa o takim ID już istnieje. Zmień ID techniczne lub nazwę.",
+      };
+    }
+
+    await db.insert(services).values({
+      id: serviceId,
+      name,
+      description,
+      price: validatedPrice,
+      duration: validatedDuration,
+      sortOrder,
+      isFixedPrice,
+      isActive,
+    });
+
+    revalidatePath("/admin");
+    revalidatePath("/admin/uslugi");
+    revalidatePath("/admin/rezerwacje");
+    revalidatePath("/");
+
+    return {
+      status: "success",
+      message: "Nowa usługa została dodana.",
+    };
+  } catch (error) {
+    console.error("Create service action error:", error);
+
+    return {
+      status: "error",
+      message: "Nie udało się dodać usługi. Spróbuj ponownie.",
+    };
+  }
 }
 
-export async function deleteServiceAction(formData: FormData) {
+export async function deleteServiceAction(
+  _prevState: ServiceActionState,
+  formData: FormData,
+): Promise<ServiceActionState> {
   await requireAuthenticatedAdmin();
 
   const rawServiceId = formData.get("serviceId");
   const serviceId = typeof rawServiceId === "string" ? rawServiceId : "";
 
   if (!serviceId) {
-    return;
+    return {
+      status: "error",
+      message: "Nie znaleziono usługi do usunięcia.",
+    };
   }
 
-  const db = getDb();
-  await db.delete(services).where(eq(services.id, serviceId));
+  try {
+    const db = getDb();
+    await db.delete(services).where(eq(services.id, serviceId));
 
-  revalidatePath("/admin");
-  revalidatePath("/admin/uslugi");
-  revalidatePath("/admin/rezerwacje");
-  revalidatePath("/");
+    revalidatePath("/admin");
+    revalidatePath("/admin/uslugi");
+    revalidatePath("/admin/rezerwacje");
+    revalidatePath("/");
+
+    return {
+      status: "success",
+      message: "Usługa została usunięta.",
+    };
+  } catch (error) {
+    console.error("Delete service action error:", error);
+
+    return {
+      status: "error",
+      message: "Nie udało się usunąć usługi. Spróbuj ponownie.",
+    };
+  }
 }
