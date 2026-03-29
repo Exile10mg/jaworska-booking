@@ -1084,7 +1084,7 @@ export default function Page() {
                         "service-list-scroll max-h-[min(58vh,38rem)] overflow-y-auto pr-3 pb-6 lg:max-h-none lg:flex-1",
                     )}
                   >
-                    <div className="space-y-2.5 lg:grid lg:grid-cols-2 lg:gap-2.5 lg:space-y-0">
+                    <div className="space-y-2.5 lg:grid lg:grid-cols-2 lg:gap-2 lg:space-y-0">
                     {services.map((service) => {
                       const isSelected = service.id === selectedServiceId;
 
@@ -1094,7 +1094,7 @@ export default function Page() {
                           type="button"
                           onClick={() => handleSelectService(service.id)}
                           className={cn(
-                            "group relative w-full overflow-hidden rounded-[24px] border p-3 text-left transition-colors duration-200 ease-in-out md:p-4 lg:h-full",
+                            "group relative w-full overflow-hidden rounded-[24px] border p-3 text-left transition-colors duration-200 ease-in-out md:p-4 lg:h-full lg:rounded-[22px] lg:p-3",
                             isSelected &&
                               "border-[#8c6b4a] bg-[#8c6b4a]/5",
                             !isSelected &&
@@ -1102,18 +1102,18 @@ export default function Page() {
                           )}
                         >
                           <div className="pointer-events-none absolute inset-x-0 top-0 h-12 bg-[linear-gradient(180deg,_rgba(255,255,255,0.5),_rgba(255,255,255,0))]" />
-                          <div className="relative flex flex-col items-start justify-between gap-2.5 md:flex-row md:items-center md:gap-3">
-                            <div className="min-w-0 flex-1 pr-3">
-                              <h3 className="text-[13px] font-semibold leading-5 text-stone-900">
+                          <div className="relative flex flex-col items-start justify-between gap-2.5 md:flex-row md:items-center md:gap-3 lg:gap-2">
+                            <div className="min-w-0 flex-1 pr-3 lg:pr-2">
+                              <h3 className="text-[13px] font-semibold leading-5 text-stone-900 lg:text-[12.5px] lg:leading-[1.35]">
                                 {service.name}
                               </h3>
-                              <p className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-stone-600 md:line-clamp-3">
+                              <p className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-stone-600 md:line-clamp-3 lg:text-[10.5px]">
                                 {service.description}
                               </p>
                             </div>
                             <div
                               className={cn(
-                                "shrink-0 flex h-12 w-full items-center justify-between rounded-xl border border-[#eadfd3] bg-white/65 px-4 py-2 md:w-28",
+                                "shrink-0 flex h-12 w-full items-center justify-between rounded-xl border border-[#eadfd3] bg-white/65 px-4 py-2 md:w-28 lg:h-11 lg:w-24 lg:px-3",
                                 isSelected && "border-[#ccb195] bg-[#fff5ea]",
                               )}
                             >
@@ -1123,7 +1123,7 @@ export default function Page() {
                                 )}
                                 <p
                                   className={cn(
-                                    "text-sm font-semibold text-[#8f6742]",
+                                    "text-sm font-semibold text-[#8f6742] lg:text-[15px]",
                                     service.isFixedPrice ? "" : "mt-1",
                                   )}
                                 >
@@ -1132,7 +1132,7 @@ export default function Page() {
                               </div>
                               <span
                                 className={cn(
-                                  "inline-flex h-5 w-5 items-center justify-center rounded-md border-2 transition-all duration-200 ease-in-out",
+                                  "inline-flex h-5 w-5 items-center justify-center rounded-md border-2 transition-all duration-200 ease-in-out lg:h-[18px] lg:w-[18px]",
                                   isSelected
                                     ? "border-stone-900 bg-stone-900 text-white"
                                     : "border-[#e5e0d8] bg-transparent text-transparent",
@@ -1144,8 +1144,8 @@ export default function Page() {
                             </div>
                           </div>
 
-                          <div className="relative mt-1.5 text-xs">
-                            <span className="inline-flex items-center gap-2 text-xs text-stone-400">
+                          <div className="relative mt-1.5 text-xs lg:mt-1">
+                            <span className="inline-flex items-center gap-2 text-xs text-stone-400 lg:text-[11px]">
                               <Clock3 className="h-3.5 w-3.5 text-[#b88659]" />
                               Czas: {formatDuration(service.duration)}
                             </span>
