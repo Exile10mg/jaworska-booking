@@ -75,16 +75,16 @@ type BookedSummary = {
 const SERVICES_LOADING_MIN_DURATION_MS = 2400;
 
 const phoneCountries: CountryOption[] = [
-  { iso: "PL", name: "Polska", dialCode: "48", flag: "đź‡µđź‡±" },
-  { iso: "DE", name: "Niemcy", dialCode: "49", flag: "đź‡©đź‡Ş" },
-  { iso: "GB", name: "Wielka Brytania", dialCode: "44", flag: "đź‡¬đź‡§" },
-  { iso: "FR", name: "Francja", dialCode: "33", flag: "đź‡«đź‡·" },
-  { iso: "ES", name: "Hiszpania", dialCode: "34", flag: "đź‡Şđź‡¸" },
-  { iso: "IT", name: "WĹ‚ochy", dialCode: "39", flag: "đź‡®đź‡ą" },
-  { iso: "UA", name: "Ukraina", dialCode: "380", flag: "đź‡şđź‡¦" },
-  { iso: "CZ", name: "Czechy", dialCode: "420", flag: "đź‡¨đź‡ż" },
-  { iso: "SK", name: "SĹ‚owacja", dialCode: "421", flag: "đź‡¸đź‡°" },
-  { iso: "US", name: "Stany Zjednoczone", dialCode: "1", flag: "đź‡şđź‡¸" },
+  { iso: "PL", name: "Polska", dialCode: "48", flag: "🇵🇱" },
+  { iso: "DE", name: "Niemcy", dialCode: "49", flag: "🇩🇪" },
+  { iso: "GB", name: "Wielka Brytania", dialCode: "44", flag: "🇬🇧" },
+  { iso: "FR", name: "Francja", dialCode: "33", flag: "🇫🇷" },
+  { iso: "ES", name: "Hiszpania", dialCode: "34", flag: "🇪🇸" },
+  { iso: "IT", name: "Włochy", dialCode: "39", flag: "🇮🇹" },
+  { iso: "UA", name: "Ukraina", dialCode: "380", flag: "🇺🇦" },
+  { iso: "CZ", name: "Czechy", dialCode: "420", flag: "🇨🇿" },
+  { iso: "SK", name: "Słowacja", dialCode: "421", flag: "🇸🇰" },
+  { iso: "US", name: "Stany Zjednoczone", dialCode: "1", flag: "🇺🇸" },
 ];
 
 function formatPhoneDigits(digits: string) {
@@ -145,10 +145,10 @@ function SuccessStep({ serviceName, dateLabel, time, onReset }: SuccessStepProps
         </div>
 
         <h2 className="mt-5 text-2xl font-bold text-stone-900">
-          Twoja rezerwacja zostaĹ‚a wysĹ‚ana!
+          Twoja rezerwacja została wysłana!
         </h2>
         <p className="mt-2 text-sm text-stone-600">
-          DziÄ™kujemy za zaufanie. Twoja wizyta jest teraz oczekujÄ…ca i czeka na potwierdzenie.
+          Dziękujemy za zaufanie. Twoja wizyta jest teraz oczekująca i czeka na potwierdzenie.
         </p>
 
         <div className="mt-4 flex w-full flex-col items-center gap-1 rounded-2xl bg-white/80 px-4 py-2 text-sm text-stone-700 md:inline-flex md:w-auto md:flex-row md:gap-2">
@@ -169,7 +169,7 @@ function SuccessStep({ serviceName, dateLabel, time, onReset }: SuccessStepProps
                 <MessageSquare className="h-4 w-4" />
               </div>
               <p>
-                Po zapisaniu rezerwacji otrzymasz SMS z informacjÄ…, ĹĽe wizyta oczekuje
+                Po zapisaniu rezerwacji otrzymasz SMS z informacją, że wizyta oczekuje
                 na potwierdzenie.
               </p>
             </div>
@@ -178,7 +178,7 @@ function SuccessStep({ serviceName, dateLabel, time, onReset }: SuccessStepProps
                 <Phone className="h-4 w-4" />
               </div>
               <p>
-                Gdy potwierdzimy termin, wyĹ›lemy kolejny SMS z potwierdzeniem wizyty.
+                Gdy potwierdzimy termin, wyślemy kolejny SMS z potwierdzeniem wizyty.
               </p>
             </div>
             <div className="flex items-start gap-3">
@@ -186,7 +186,7 @@ function SuccessStep({ serviceName, dateLabel, time, onReset }: SuccessStepProps
                 <Bell className="h-4 w-4" />
               </div>
               <p>
-                JeĹ›li wizyta zostanie anulowana, rĂłwnieĹĽ otrzymasz osobny SMS z takÄ… informacjÄ….
+                Jeśli wizyta zostanie anulowana, również otrzymasz osobny SMS z taką informacją.
               </p>
             </div>
           </div>
@@ -197,7 +197,7 @@ function SuccessStep({ serviceName, dateLabel, time, onReset }: SuccessStepProps
           onClick={onReset}
           className="mt-6 flex h-12 w-full items-center justify-center rounded-2xl bg-stone-900 px-4 text-sm font-semibold text-white transition hover:bg-black"
         >
-          Rozumiem, wrĂłÄ‡ do strony gĹ‚Ăłwnej
+          Rozumiem, wróć do strony głównej
         </button>
       </div>
     </div>
@@ -237,7 +237,7 @@ function ServicesLoadingState() {
     <div className="animate-step-enter space-y-3 pb-1">
       <div className="loading-sheen overflow-hidden rounded-[24px] border border-[#ead8c6] bg-[linear-gradient(135deg,_#fffaf5_0%,_#fff5ea_55%,_#fffaf5_100%)] p-4">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8c6b4a]">
-          Aktualizujemy ofertÄ™
+          Aktualizujemy ofertę
         </p>
         <div className="mt-2 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#8c6b4a]/10 text-[#8c6b4a]">
@@ -245,10 +245,10 @@ function ServicesLoadingState() {
           </div>
           <div>
             <p className="text-sm font-semibold text-stone-900">
-              Ĺadujemy usĹ‚ugi z bazy danych
+              Ładujemy usługi z bazy danych
             </p>
             <p className="mt-0.5 text-xs leading-5 text-stone-600">
-              Zaraz pokaĹĽemy aktualny cennik i dostÄ™pne zabiegi.
+              Zaraz pokażemy aktualny cennik i dostępne zabiegi.
             </p>
           </div>
         </div>
@@ -466,7 +466,6 @@ export default function Page() {
   const [visibleMonthLabel, setVisibleMonthLabel] = useState(() =>
     capitalize(monthYearFormatter.format(parseDateKey(todayKey))),
   );
-
   const selectedService =
     services.find((service) => service.id === selectedServiceId) ?? null;
   const upcomingDays = getUpcomingDaysFromToday(visibleDaysCount, availability, now);
@@ -501,7 +500,6 @@ export default function Page() {
     ? legalDocuments[legalModalContent]
     : null;
   const shouldScrollServices = services.length > 6;
-  const shouldPinServiceFooter = isServicesLoading || shouldScrollServices;
   const contactReady = name.trim().length > 1 && phone.length >= 6;
   const headerSecondaryButtonClass =
     "flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 h-10 text-sm font-medium text-gray-700 shadow-sm transition-[transform,background-color,color] duration-200 ease-in-out md:hover:scale-[1.03]";
@@ -509,7 +507,7 @@ export default function Page() {
     "flex items-center gap-2 rounded-full bg-stone-900 px-4 h-10 text-sm font-medium text-white shadow-sm transition-[transform,background-color,color] duration-200 ease-in-out hover:bg-black md:hover:scale-[1.03]";
 
   const stepMeta = [
-    { id: 1, label: "UsĹ‚uga" },
+    { id: 1, label: "Usługa" },
     { id: 2, label: "Termin" },
     { id: 3, label: "Kontakt" },
     { id: 4, label: "Potwierdzenie" },
@@ -714,7 +712,7 @@ export default function Page() {
     if (!selectedDate || !selectedTime) return;
     if (!availableTimeSlots.includes(selectedTime)) {
       setSelectedTime(null);
-      setSubmitError("Wybrany termin nie jest juĹĽ dostÄ™pny. Wybierz nowÄ… godzinÄ™.");
+      setSubmitError("Wybrany termin nie jest już dostępny. Wybierz nową godzinę.");
       setStep(2);
       return;
     }
@@ -811,7 +809,7 @@ export default function Page() {
         });
 
         if (!response.ok) {
-          throw new Error("Nie udaĹ‚o siÄ™ pobraÄ‡ usĹ‚ug.");
+          throw new Error("Nie udało się pobrać usług.");
         }
 
         const data = (await response.json()) as { services?: Service[] };
@@ -823,7 +821,7 @@ export default function Page() {
         if (cancelled) return;
         console.error(error);
         setServices([]);
-        setServicesError("Nie udaĹ‚o siÄ™ pobraÄ‡ listy usĹ‚ug. OdĹ›wieĹĽ stronÄ™.");
+        setServicesError("Nie udało się pobrać listy usług. Odśwież stronę.");
       } finally {
         const elapsed = Date.now() - loadingStartedAt;
         const remaining = Math.max(
@@ -858,7 +856,7 @@ export default function Page() {
         });
 
         if (!response.ok) {
-          throw new Error("Nie udaĹ‚o siÄ™ pobraÄ‡ treĹ›ci dokumentĂłw.");
+          throw new Error("Nie udało się pobrać treści dokumentów.");
         }
 
         const data = (await response.json()) as {
@@ -891,7 +889,7 @@ export default function Page() {
     });
 
     if (!response.ok) {
-      throw new Error("Nie udaĹ‚o siÄ™ pobraÄ‡ dostÄ™pnoĹ›ci.");
+      throw new Error("Nie udało się pobrać dostępności.");
     }
 
     const data = (await response.json()) as {
@@ -914,7 +912,7 @@ export default function Page() {
         });
 
         if (!response.ok) {
-          throw new Error("Nie udaĹ‚o siÄ™ pobraÄ‡ dostÄ™pnoĹ›ci.");
+          throw new Error("Nie udało się pobrać dostępności.");
         }
 
         const data = (await response.json()) as {
@@ -929,7 +927,7 @@ export default function Page() {
         console.error(error);
         setAvailability({});
         setAvailabilityError(
-          "Nie udaĹ‚o siÄ™ pobraÄ‡ terminarza. SprĂłbuj odĹ›wieĹĽyÄ‡ stronÄ™.",
+          "Nie udało się pobrać terminarza. Spróbuj odświeżyć stronę.",
         );
       } finally {
         if (!cancelled) {
@@ -1081,7 +1079,7 @@ export default function Page() {
                   className="inline-flex items-center gap-1.5 transition-colors hover:text-stone-900 md:hidden"
                 >
                   <MapPin className="h-3.5 w-3.5" />
-                  RĂłĹĽana 28/66, 20-538 Lublin
+                  Różana 28/66, 20-538 Lublin
                 </a>
 
                 <div className="mt-1 flex flex-col items-center gap-1 md:hidden">
@@ -1111,7 +1109,7 @@ export default function Page() {
                     className="inline-flex items-center gap-1.5 transition-colors hover:text-stone-900"
                   >
                     <MapPin className="h-3.5 w-3.5" />
-                      RĂłĹĽana 28/66, 20-538 Lublin
+                      Różana 28/66, 20-538 Lublin
                   </a>
                   <span className="text-stone-300">|</span>
                   <a
@@ -1152,7 +1150,7 @@ export default function Page() {
                     className={`${headerSecondaryButtonClass} h-12 w-12 justify-center px-0 text-xs cursor-pointer transition-colors hover:bg-gray-50 md:h-9 md:w-auto md:gap-2 md:px-3.5 md:text-sm`}
                   >
                     <MapPin className="h-5 w-5 text-stone-500 md:h-4 md:w-4" />
-                    <span className="hidden md:inline">PokaĹĽ na mapie</span>
+                    <span className="hidden md:inline">Pokaż na mapie</span>
                   </button>
                 </div>
                 <a
@@ -1160,7 +1158,7 @@ export default function Page() {
                   className={`${headerPrimaryButtonClass} h-10 w-full justify-center px-3.5 text-sm cursor-pointer md:h-9 md:w-auto md:text-sm`}
                 >
                   <Phone className="h-4 w-4 text-white" />
-                  ZadzwoĹ„ teraz
+                  Zadzwoń teraz
                 </a>
               </div>
             </div>
@@ -1237,14 +1235,14 @@ export default function Page() {
                 <h2
                   className="mt-2 text-2xl font-medium text-gray-800"
                 >
-                  {step === 1 && "Wybierz usĹ‚ugÄ™"}
-                  {step === 2 && "ZnajdĹş dogodny termin"}
-                  {step === 3 && "UzupeĹ‚nij dane"}
-                  {step === 4 && "SprawdĹş podsumowanie"}
+                  {step === 1 && "Wybierz usługę"}
+                  {step === 2 && "Znajdź dogodny termin"}
+                  {step === 3 && "Uzupełnij dane"}
+                  {step === 4 && "Sprawdź podsumowanie"}
                 </h2>
                 {step === 1 && (
                   <p className="mt-1 text-sm font-normal text-gray-500">
-                    Zaznacz interesujÄ…cy CiÄ™ zabieg, aby przejĹ›Ä‡ dalej.
+                    Zaznacz interesujący Cię zabieg, aby przejść dalej.
                   </p>
                 )}
               </div>
@@ -1255,17 +1253,9 @@ export default function Page() {
 
           {step === 1 && (
             <div
-              className={cn(
-                "animate-step-enter flex flex-col",
-                shouldPinServiceFooter ? "h-auto lg:h-full lg:min-h-0" : "h-auto",
-              )}
+              className="animate-step-enter flex flex-col lg:h-full lg:min-h-0"
             >
-              <div
-                className={cn(
-                  shouldPinServiceFooter &&
-                    "lg:flex lg:min-h-0 lg:flex-1 lg:flex-col lg:overflow-hidden",
-                )}
-              >
+              <div className="lg:flex lg:min-h-0 lg:flex-1 lg:flex-col lg:overflow-hidden">
                 {isServicesLoading ? (
                   <ServicesLoadingState />
                 ) : servicesError ? (
@@ -1274,14 +1264,14 @@ export default function Page() {
                   </div>
                 ) : services.length === 0 ? (
                   <div className="rounded-[24px] border border-dashed border-stone-200 bg-stone-50 px-4 py-8 text-center text-sm text-stone-500">
-                    Brak aktywnych usĹ‚ug do rezerwacji.
+                    Brak aktywnych usług do rezerwacji.
                   </div>
                 ) : (
                   <div
                     className={cn(
-                      !shouldScrollServices && "pb-1",
+                      "pb-1 lg:flex-1",
                       shouldScrollServices &&
-                        "pb-1 lg:service-list-scroll lg:flex-1 lg:overflow-y-auto lg:pr-3 lg:pb-6",
+                        "lg:service-list-scroll lg:overflow-y-auto lg:pr-3 lg:pb-6",
                     )}
                   >
                     <div className="space-y-2.5 lg:grid lg:grid-cols-2 lg:gap-2 lg:space-y-0">
@@ -1294,7 +1284,7 @@ export default function Page() {
                           type="button"
                           onClick={() => handleSelectService(service.id)}
                           className={cn(
-                            "group relative min-h-[132px] w-full overflow-hidden rounded-[24px] border p-3 text-left transition-colors duration-200 ease-in-out md:min-h-[134px] md:p-4 lg:h-full lg:rounded-[22px] lg:p-3",
+                            "group relative w-full min-h-[132px] overflow-hidden rounded-[24px] border p-3 text-left transition-colors duration-200 ease-in-out md:min-h-[134px] md:p-4 lg:h-full lg:rounded-[22px] lg:p-3",
                             isSelected &&
                               "border-[#8c6b4a] bg-[#8c6b4a]/5",
                             !isSelected &&
@@ -1327,7 +1317,7 @@ export default function Page() {
                                     service.isFixedPrice ? "" : "mt-1",
                                   )}
                                 >
-                                  {service.price} zĹ‚
+                                  {service.price} zł
                                 </p>
                               </div>
                               <span
@@ -1337,7 +1327,7 @@ export default function Page() {
                                     ? "border-stone-900 bg-stone-900 text-white"
                                     : "border-[#e5e0d8] bg-transparent text-transparent",
                                 )}
-                                aria-label={isSelected ? "Wybrano usĹ‚ugÄ™" : "Wybierz usĹ‚ugÄ™"}
+                                aria-label={isSelected ? "Wybrano usługę" : "Wybierz usługę"}
                               >
                                 <Check className="h-3.5 w-3.5" />
                               </span>
@@ -1357,14 +1347,14 @@ export default function Page() {
                   </div>
                 )}
               </div>
-              <div className="sticky bottom-0 z-10 mt-4 shrink-0 bg-[#fcfaf8] pt-3 md:static md:bottom-auto md:z-auto md:bg-transparent md:pt-0 lg:mt-auto">
+              <div className="sticky bottom-0 z-20 mt-auto -mx-1 shrink-0 bg-[#fcfaf8]/95 px-1 pb-1 pt-3 backdrop-blur supports-[backdrop-filter]:bg-[#fcfaf8]/80 md:static md:mx-0 md:bg-transparent md:px-0 md:pb-0 md:pt-5">
                 <button
                   type="button"
                   onClick={() => selectedServiceId && setStep(2)}
                   disabled={!selectedServiceId}
                   className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-stone-900 px-4 text-sm font-semibold text-white transition-[transform,background-color,color] duration-200 ease-in-out hover:bg-stone-800 md:hover:scale-[1.01] disabled:cursor-not-allowed disabled:bg-stone-300 disabled:opacity-50"
                 >
-                  PrzejdĹş do terminu
+                  Przejdź do terminu
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
@@ -1376,7 +1366,7 @@ export default function Page() {
               <div className="space-y-2.5 md:space-y-4 lg:space-y-3">
               <div className="rounded-[24px] border border-[#ead8c6] bg-[#fffaf5] p-3 md:p-4">
                 <p className="text-xs uppercase tracking-[0.24em] text-[#9b6f47]">
-                  Wybrana usĹ‚uga
+                  Wybrana usługa
                 </p>
                 <div className="mt-2 flex items-start justify-between gap-2.5 md:gap-3">
                   <div className="min-w-0 flex-1 pr-2">
@@ -1388,7 +1378,7 @@ export default function Page() {
                     </p>
                   </div>
                   <p className="shrink-0 whitespace-nowrap text-base font-semibold text-stone-900 md:text-lg">
-                    {selectedService.price} zĹ‚
+                    {selectedService.price} zł
                   </p>
                 </div>
               </div>
@@ -1405,7 +1395,7 @@ export default function Page() {
                         ? "border-stone-200 text-stone-600 hover:border-stone-300"
                         : "cursor-not-allowed border-stone-100 text-stone-300",
                     )}
-                    aria-label="PrzewiĹ„ dni w lewo"
+                    aria-label="Przewiń dni w lewo"
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </button>
@@ -1421,7 +1411,7 @@ export default function Page() {
                         ? "border-stone-200 text-stone-600 hover:border-stone-300"
                         : "border-stone-200 text-stone-500 hover:border-stone-300",
                     )}
-                    aria-label="PrzewiĹ„ dni w prawo"
+                    aria-label="Przewiń dni w prawo"
                   >
                     <ChevronRight className="h-4 w-4" />
                   </button>
@@ -1494,8 +1484,8 @@ export default function Page() {
                 <div className="mb-3 inline-flex w-full rounded-2xl bg-stone-100 p-1 md:mb-4">
                   {[
                     { id: "morning", label: "Rano" },
-                    { id: "afternoon", label: "PopoĹ‚udnie" },
-                    { id: "evening", label: "WieczĂłr" },
+                    { id: "afternoon", label: "Popołudnie" },
+                    { id: "evening", label: "Wieczór" },
                   ].map((period) => {
                     const isActive = selectedTimePeriod === period.id;
 
@@ -1522,7 +1512,7 @@ export default function Page() {
 
                 {isAvailabilityLoading ? (
                   <div className="flex h-10 items-center justify-center rounded-xl border border-dashed border-stone-300 bg-stone-50 px-3 text-center text-xs text-stone-500">
-                    Ĺadowanie terminarza...
+                    Ładowanie terminarza...
                   </div>
                 ) : availabilityError ? (
                   <div className="flex min-h-10 items-center justify-center rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-center text-xs text-red-700">
@@ -1542,7 +1532,7 @@ export default function Page() {
                             ? "border-stone-200 text-stone-600 hover:border-stone-300"
                             : "pointer-events-none border-stone-100 text-stone-300 opacity-30",
                         )}
-                        aria-label="PrzewiĹ„ godziny w lewo"
+                        aria-label="Przewiń godziny w lewo"
                       >
                         <ChevronLeft className="h-4 w-4" />
                       </button>
@@ -1597,7 +1587,7 @@ export default function Page() {
                             ? "border-stone-200 text-stone-600 hover:border-stone-300"
                             : "pointer-events-none border-stone-100 text-stone-300 opacity-30",
                         )}
-                        aria-label="PrzewiĹ„ godziny w prawo"
+                        aria-label="Przewiń godziny w prawo"
                       >
                         <ChevronRight className="h-4 w-4" />
                       </button>
@@ -1607,12 +1597,12 @@ export default function Page() {
                     <div className="flex h-10 items-center justify-center rounded-xl border border-dashed border-stone-300 bg-stone-50 px-3 text-center text-xs text-stone-500">
                       {availableTimeSlots.length > 0
                         ? "Brak wolnych godzin w tej porze dnia."
-                        : "Brak terminĂłw w tym dniu."}
+                        : "Brak terminów w tym dniu."}
                     </div>
                   )
                 ) : (
                   <div className="flex h-10 items-center justify-center rounded-xl border border-dashed border-stone-300 bg-stone-50 px-3 text-center text-xs text-stone-500">
-                    Najpierw wybierz dzieĹ„, aby zobaczyÄ‡ wolne godziny.
+                    Najpierw wybierz dzień, aby zobaczyć wolne godziny.
                   </div>
                 )}
               </div>
@@ -1633,7 +1623,7 @@ export default function Page() {
                   disabled={!selectedDate || !selectedTime}
                   className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-stone-900 px-4 text-sm font-semibold text-white transition-[transform,background-color,color] duration-200 ease-in-out hover:bg-stone-800 md:hover:scale-[1.01] disabled:cursor-not-allowed disabled:bg-stone-300 disabled:opacity-50"
                 >
-                  PrzejdĹş dalej
+                  Przejdź dalej
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
@@ -1651,7 +1641,7 @@ export default function Page() {
               <div className="space-y-3 lg:space-y-2.5">
                 <div className="rounded-[26px] border border-[#ead8c6] bg-[#fffaf5] p-3.5">
                   <p className="text-xs uppercase tracking-[0.24em] text-[#9b6f47]">
-                    TwĂłj termin
+                    Twój termin
                   </p>
                   <div className="mt-2 space-y-1.5 text-sm text-stone-700">
                     <p className="font-semibold text-stone-900">{selectedService.name}</p>
@@ -1667,7 +1657,7 @@ export default function Page() {
                       className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500"
                     >
                       <UserRound className="h-3.5 w-3.5 text-[#b88659]" />
-                      ImiÄ™ i nazwisko
+                      Imię i nazwisko
                     </label>
                     <input
                       id="booking-name"
@@ -1750,7 +1740,7 @@ export default function Page() {
                     rows={3}
                     value={notes}
                     onChange={(event) => setNotes(event.target.value)}
-                    placeholder="Opcjonalnie: napisz, jeĹ›li chcesz coĹ› doprecyzowaÄ‡"
+                    placeholder="Opcjonalnie: napisz, jeśli chcesz coś doprecyzować"
                     className="h-20 max-h-[100px] w-full resize-none rounded-2xl border border-stone-200 bg-white px-3.5 pb-2.5 pt-3 text-sm outline-none transition-[border-color,box-shadow] duration-200 ease-in-out placeholder:text-stone-400 focus:border-[#c79963] focus:ring-4 focus:ring-[#f4e5d5]"
                   />
                 </div>
@@ -1762,10 +1752,10 @@ export default function Page() {
                     </div>
                     <div>
                       <p className="font-semibold text-stone-900">
-                        PĹ‚atnoĹ›Ä‡ tylko gotĂłwkÄ… w salonie
+                        Płatność tylko gotówką w salonie
                       </p>
                       <p className="mt-0.5 leading-5 text-stone-600">
-                        Rezerwacja nie wymaga przedpĹ‚aty ani pĹ‚atnoĹ›ci online.
+                        Rezerwacja nie wymaga przedpłaty ani płatności online.
                       </p>
                     </div>
                   </div>
@@ -1799,7 +1789,7 @@ export default function Page() {
                     )}
                   />
                   <p className="text-sm leading-6 text-gray-700">
-                    PrzeczytaĹ‚am i akceptujÄ™{" "}
+                    Przeczytałam i akceptuję{" "}
                     <button
                       type="button"
                       onClick={() => openLegalModal("regulamin")}
@@ -1813,15 +1803,15 @@ export default function Page() {
                       onClick={() => openLegalModal("polityka")}
                       className="cursor-pointer font-semibold text-[#8c6b4a] underline transition-colors hover:text-[#6f543a]"
                     >
-                      PolitykÄ™ PrywatnoĹ›ci
+                      Politykę Prywatności
                     </button>{" "}
-                    serwisu. Wiem, ĹĽe sÄ… one niezbÄ™dne do realizacji mojej
+                    serwisu. Wiem, że są one niezbędne do realizacji mojej
                     rezerwacji.
                   </p>
                 </div>
                 {showLegalError && !isLegalAccepted && (
                   <p className="mt-2 pl-10 text-xs font-medium text-red-600">
-                    Aby przejĹ›Ä‡ dalej, zaakceptuj Regulamin i PolitykÄ™ PrywatnoĹ›ci.
+                    Aby przejść dalej, zaakceptuj Regulamin i Politykę Prywatności.
                   </p>
                 )}
               </div>
@@ -1850,7 +1840,7 @@ export default function Page() {
                   }}
                   className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-stone-900 px-4 text-sm font-semibold text-white transition-[transform,background-color,color] duration-200 ease-in-out hover:bg-stone-800 md:hover:scale-[1.01] disabled:cursor-not-allowed disabled:bg-stone-300"
                 >
-                  PrzejdĹş dalej
+                  Przejdź dalej
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
@@ -1870,7 +1860,7 @@ export default function Page() {
                     <div className="rounded-2xl bg-stone-50/90 p-3">
                       <p className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">
                         <CheckCircle2 className="h-3.5 w-3.5 text-[#8c6b4a]" />
-                        UsĹ‚uga
+                        Usługa
                       </p>
                       <p className="mt-1.5 text-base font-semibold leading-5 text-stone-900">
                         {selectedService.name}
@@ -1929,13 +1919,13 @@ export default function Page() {
 
                 <div className="rounded-[24px] border border-[#e6d4bf] border-l-4 border-l-[#8c6b4a] bg-[#fff8f1] p-3.5 text-sm text-stone-700">
                   <p className="font-semibold uppercase tracking-[0.16em] text-stone-500">
-                    Do zapĹ‚aty na miejscu
+                    Do zapłaty na miejscu
                   </p>
                   <p className="mt-1 text-3xl font-bold text-stone-900">
-                    {selectedService.price} zĹ‚
+                    {selectedService.price} zł
                   </p>
                   <p className="mt-1.5 text-xs leading-5 text-stone-600">
-                    PĹ‚atnoĹ›Ä‡ gotĂłwkÄ… po wizycie.
+                    Płatność gotówką po wizycie.
                   </p>
                 </div>
               </div>
@@ -1983,7 +1973,7 @@ export default function Page() {
                           | { error?: string }
                           | null;
                         throw new Error(
-                          payload?.error ?? "Nie udaĹ‚o siÄ™ zapisaÄ‡ rezerwacji.",
+                          payload?.error ?? "Nie udało się zapisać rezerwacji.",
                         );
                       }
 
@@ -2007,7 +1997,7 @@ export default function Page() {
                       console.error(error);
                       if (
                         error instanceof Error &&
-                        error.message === "Wybrany termin nie jest juĹĽ dostÄ™pny."
+                        error.message === "Wybrany termin nie jest już dostępny."
                       ) {
                         try {
                           await loadAvailability();
@@ -2018,7 +2008,7 @@ export default function Page() {
                         setSelectedTime(null);
                         setStep(2);
                         setSubmitError(
-                          "Wybrany termin nie jest juĹĽ dostÄ™pny. Wybierz nowÄ… godzinÄ™.",
+                          "Wybrany termin nie jest już dostępny. Wybierz nową godzinę.",
                         );
                         return;
                       }
@@ -2026,7 +2016,7 @@ export default function Page() {
                       setSubmitError(
                         error instanceof Error
                           ? error.message
-                          : "Nie udaĹ‚o siÄ™ zapisaÄ‡ rezerwacji. SprĂłbuj ponownie.",
+                          : "Nie udało się zapisać rezerwacji. Spróbuj ponownie.",
                       );
                     } finally {
                       setIsSubmitting(false);
@@ -2035,7 +2025,7 @@ export default function Page() {
                   disabled={isSubmitting}
                   className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-stone-900 px-4 text-sm font-semibold text-white transition-all hover:bg-black disabled:cursor-not-allowed disabled:bg-stone-300"
                 >
-                  {isSubmitting ? "Zapisywanie..." : "PotwierdĹş rezerwacjÄ™"}
+                  {isSubmitting ? "Zapisywanie..." : "Potwierdź rezerwację"}
                 </button>
               </div>
 
@@ -2153,7 +2143,7 @@ export default function Page() {
               type="button"
               onClick={() => setIsMapModalOpen(false)}
               className="absolute right-4 top-4 z-10 rounded-full bg-white p-2 shadow-md transition-colors hover:bg-gray-100"
-              aria-label="Zamknij mapÄ™"
+              aria-label="Zamknij mapę"
             >
               <X className="h-4 w-4 text-stone-700" />
             </button>
@@ -2171,4 +2161,3 @@ export default function Page() {
     </main>
   );
 }
-
