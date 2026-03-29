@@ -57,6 +57,12 @@ type SuccessStepProps = {
   onReset: () => void;
 };
 
+type BookedSummary = {
+  serviceName: string;
+  dateLabel: string;
+  time: string;
+};
+
 const phoneCountries: CountryOption[] = [
   { iso: "PL", name: "Polska", dialCode: "48", flag: "🇵🇱" },
   { iso: "DE", name: "Niemcy", dialCode: "49", flag: "🇩🇪" },
@@ -376,6 +382,7 @@ export default function Page() {
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isBooked, setIsBooked] = useState(false);
+  const [bookedSummary, setBookedSummary] = useState<BookedSummary | null>(null);
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isLegalAccepted, setIsLegalAccepted] = useState(false);
@@ -714,6 +721,7 @@ export default function Page() {
     setShowLegalError(false);
     setLegalModalContent(null);
     setIsBooked(false);
+    setBookedSummary(null);
     setSubmitError(null);
   }
 
@@ -828,7 +836,7 @@ export default function Page() {
       ? getAvailableTimeSlots(selectedDate, availability)
       : [];
 
-    if (selectedTime && !slotsForSelectedDate.includes(selectedTime)) {
+    if (!isBooked && selectedTime && !slotsForSelectedDate.includes(selectedTime)) {
       setSelectedTime(null);
     }
 
@@ -838,7 +846,7 @@ export default function Page() {
       }
       return;
     }
-  }, [availability, selectedDate, selectedTime, selectedTimePeriod]);
+  }, [availability, isBooked, selectedDate, selectedTime, selectedTimePeriod]);
 
   useEffect(() => {
     if (isLegalAccepted) {
@@ -1875,6 +1883,11 @@ export default function Page() {
                           [selectedDate]: nextSlots,
                         };
                       });
+                      setBookedSummary({
+                        serviceName: selectedService.name,
+                        dateLabel: selectedDay?.fullLabel ?? "",
+                        time: selectedTime,
+                      });
                       setIsBooked(true);
                     } catch (error) {
                       console.error(error);
@@ -1920,11 +1933,11 @@ export default function Page() {
             </div>
           )}
 
-          {isBooked && selectedService && selectedDay && selectedTime && (
+          {isBooked && bookedSummary && (
             <SuccessStep
-              serviceName={selectedService.name}
-              dateLabel={selectedDay.fullLabel}
-              time={selectedTime}
+              serviceName={bookedSummary.serviceName}
+              dateLabel={bookedSummary.dateLabel}
+              time={bookedSummary.time}
               onReset={resetBooking}
             />
           )}
