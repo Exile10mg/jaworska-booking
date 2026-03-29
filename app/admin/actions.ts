@@ -120,6 +120,7 @@ export async function updateBookingStatusAction(formData: FormData) {
     .where(eq(bookings.id, bookingId));
 
   revalidatePath("/admin");
+  revalidatePath("/admin/rezerwacje");
 }
 
 export async function updateServiceAction(formData: FormData) {
@@ -158,6 +159,7 @@ export async function updateServiceAction(formData: FormData) {
     .where(eq(services.id, serviceId));
 
   revalidatePath("/admin");
+  revalidatePath("/admin/uslugi");
   revalidatePath("/");
 }
 
@@ -205,5 +207,26 @@ export async function createServiceAction(formData: FormData) {
   });
 
   revalidatePath("/admin");
+  revalidatePath("/admin/uslugi");
+  revalidatePath("/admin/rezerwacje");
+  revalidatePath("/");
+}
+
+export async function deleteServiceAction(formData: FormData) {
+  await requireAuthenticatedAdmin();
+
+  const rawServiceId = formData.get("serviceId");
+  const serviceId = typeof rawServiceId === "string" ? rawServiceId : "";
+
+  if (!serviceId) {
+    return;
+  }
+
+  const db = getDb();
+  await db.delete(services).where(eq(services.id, serviceId));
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/uslugi");
+  revalidatePath("/admin/rezerwacje");
   revalidatePath("/");
 }
