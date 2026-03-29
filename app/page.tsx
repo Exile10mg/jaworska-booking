@@ -501,6 +501,7 @@ export default function Page() {
     ? legalDocuments[legalModalContent]
     : null;
   const shouldScrollServices = services.length > 6;
+  const shouldPinServiceFooter = isServicesLoading || shouldScrollServices;
   const contactReady = name.trim().length > 1 && phone.length >= 6;
   const headerSecondaryButtonClass =
     "flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 h-10 text-sm font-medium text-gray-700 shadow-sm transition-[transform,background-color,color] duration-200 ease-in-out md:hover:scale-[1.03]";
@@ -1256,12 +1257,13 @@ export default function Page() {
             <div
               className={cn(
                 "animate-step-enter flex flex-col",
-                shouldScrollServices ? "h-auto lg:h-full lg:min-h-0" : "h-auto",
+                shouldPinServiceFooter ? "h-auto lg:h-full lg:min-h-0" : "h-auto",
               )}
             >
               <div
                 className={cn(
-                  shouldScrollServices && "lg:flex lg:min-h-0 lg:flex-1 lg:flex-col lg:overflow-hidden",
+                  shouldPinServiceFooter &&
+                    "lg:flex lg:min-h-0 lg:flex-1 lg:flex-col lg:overflow-hidden",
                 )}
               >
                 {isServicesLoading ? (
@@ -1355,7 +1357,7 @@ export default function Page() {
                   </div>
                 )}
               </div>
-              <div className="sticky bottom-0 z-10 mt-4 shrink-0 bg-[#fcfaf8] pt-3 md:static md:bottom-auto md:z-auto md:bg-transparent md:pt-0">
+              <div className="sticky bottom-0 z-10 mt-4 shrink-0 bg-[#fcfaf8] pt-3 md:static md:bottom-auto md:z-auto md:bg-transparent md:pt-0 lg:mt-auto">
                 <button
                   type="button"
                   onClick={() => selectedServiceId && setStep(2)}
