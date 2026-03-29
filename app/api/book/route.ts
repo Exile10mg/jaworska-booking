@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/db/client";
 import { availabilitySlots, bookings } from "@/db/schema";
 import { normalizeDateKey, normalizeTimeValue } from "@/lib/availability";
+import { sendBookingConfirmationSms } from "@/lib/sms-notifications";
 
 type BookingPayload = {
   serviceId?: string;
@@ -92,6 +93,19 @@ export async function POST(request: NextRequest) {
           paymentMethod: bookings.paymentMethod,
           status: bookings.status,
         });
+
+      try {
+        await sendBookingConfirmationSms({
+          serviceName: bookingRecord.serviceName,
+          appointmentDate: bookingRecord.date,
+          appointmentTime: bookingRecord.time,
+          customerName: bookingRecord.name,
+          customerPhone: bookingRecord.phone,
+          price: bookingRecord.price,
+        });
+      } catch (notificationError) {
+        console.error("Booking SMS notification error:", notificationError);
+      }
 
       return NextResponse.json(
         {

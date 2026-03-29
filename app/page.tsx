@@ -15,7 +15,6 @@ import {
   CreditCard,
   Instagram,
   MapPin,
-  Mail,
   MessageSquare,
   MessageSquareText,
   Phone,
@@ -143,7 +142,7 @@ function SuccessStep({ serviceName, dateLabel, time, onReset }: SuccessStepProps
           Twoja rezerwacja została wysłana!
         </h2>
         <p className="mt-2 text-sm text-stone-600">
-          Dziękujemy za zaufanie. Poniżej znajdziesz harmonogram powiadomień.
+          Dziękujemy za zaufanie. Po zapisaniu wysyłamy SMS z podsumowaniem wizyty.
         </p>
 
         <div className="mt-4 flex w-full flex-col items-center gap-1 rounded-2xl bg-white/80 px-4 py-2 text-sm text-stone-700 md:inline-flex md:w-auto md:flex-row md:gap-2">
@@ -161,20 +160,19 @@ function SuccessStep({ serviceName, dateLabel, time, onReset }: SuccessStepProps
           <div className="mt-3 space-y-3 text-sm text-stone-700">
             <div className="flex items-start gap-3">
               <div className="mt-0.5 rounded-full bg-[#fff4e8] p-2 text-[#8c6b4a]">
-                <Mail className="h-4 w-4" />
+                <MessageSquare className="h-4 w-4" />
               </div>
               <p>
-                Właśnie wysłaliśmy do Ciebie e-mail oraz SMS z potwierdzeniem
-                złożenia rezerwacji.
+                Po zapisaniu rezerwacji otrzymasz SMS z potwierdzeniem i szczegółami wizyty.
               </p>
             </div>
             <div className="flex items-start gap-3">
               <div className="mt-0.5 rounded-full bg-[#fff4e8] p-2 text-[#8c6b4a]">
-                <MessageSquare className="h-4 w-4" />
+                <Phone className="h-4 w-4" />
               </div>
               <p>
-                Gdy tylko zaakceptujemy Twój termin, otrzymasz kolejne
-                powiadomienie.
+                Jeśli będziemy potrzebowali doprecyzować rezerwację, skontaktujemy się
+                z Tobą telefonicznie.
               </p>
             </div>
             <div className="flex items-start gap-3">
@@ -182,11 +180,8 @@ function SuccessStep({ serviceName, dateLabel, time, onReset }: SuccessStepProps
                 <Bell className="h-4 w-4" />
               </div>
               <p>
-                Przypomnimy Ci o wizycie{" "}
-                <span className="rounded-md bg-[#8c6b4a]/10 px-1.5 py-0.5 font-semibold text-stone-900">
-                  1 godzinę przed
-                </span>{" "}
-                spotkaniem (E-mail + SMS).
+                Zachowaj wiadomość SMS, bo znajdziesz tam najważniejsze dane potrzebne
+                przed wizytą.
               </p>
             </div>
           </div>
