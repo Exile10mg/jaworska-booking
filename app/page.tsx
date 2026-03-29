@@ -1903,7 +1903,8 @@ export default function Page() {
 
                   <div className="mt-2.5 grid gap-2 lg:grid-cols-2">
                     <div className="rounded-2xl border border-stone-200 bg-white p-3">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">
+                      <p className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">
+                        <UserRound className="h-3.5 w-3.5 text-[#8c6b4a]" />
                         Kontakt
                       </p>
                       <div className="mt-2 flex flex-col gap-2 text-sm text-stone-800">
@@ -1927,8 +1928,14 @@ export default function Page() {
                         <p className="mt-1.5 text-sm leading-5 text-gray-600">{notes}</p>
                       </div>
                     ) : (
-                      <div className="rounded-2xl border border-dashed border-stone-200 bg-stone-50/80 p-3 text-sm text-stone-500">
-                        Brak dodatkowych uwag.
+                      <div className="rounded-2xl border border-dashed border-stone-200 bg-stone-50/80 p-3">
+                        <p className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">
+                          <MessageSquareText className="h-3.5 w-3.5 text-[#8c6b4a]" />
+                          Uwagi
+                        </p>
+                        <p className="mt-1.5 text-sm leading-5 text-stone-500">
+                          Brak dodatkowych uwag.
+                        </p>
                       </div>
                     )}
                   </div>
