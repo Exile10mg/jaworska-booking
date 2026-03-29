@@ -18,6 +18,7 @@ import {
   MessageSquare,
   MessageSquareText,
   Phone,
+  ShieldAlert,
   Sparkles,
   User,
   UserRound,
@@ -218,16 +219,16 @@ function SuccessStep({ serviceName, dateLabel, time, onReset }: SuccessStepProps
 function ServiceCardSkeleton({ index }: { index: number }) {
   return (
     <div
-      className="loading-sheen animate-card-enter relative min-h-[132px] overflow-hidden rounded-[24px] border border-stone-200 bg-[linear-gradient(180deg,_#fffdfa_0%,_#fff8f2_100%)] p-3 md:min-h-[134px] md:p-4 lg:rounded-[22px] lg:p-3"
+      className="loading-sheen animate-card-enter relative min-h-[184px] overflow-hidden rounded-[24px] border border-stone-200 bg-[linear-gradient(180deg,_#fffdfa_0%,_#fff8f2_100%)] p-3 md:min-h-[134px] md:p-4 lg:rounded-[22px] lg:p-3"
       style={{ animationDelay: `${index * 60}ms` }}
       aria-hidden="true"
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-12 bg-[linear-gradient(180deg,_rgba(255,255,255,0.5),_rgba(255,255,255,0))]" />
-      <div className="flex flex-col items-start justify-between gap-2.5 md:flex-row md:items-center md:gap-3 lg:gap-2">
+      <div className="relative flex flex-col gap-2.5 md:flex-row md:items-center md:justify-between md:gap-3 lg:gap-2">
         <div className="min-w-0 flex-1 pr-3 lg:pr-2">
-          <div className="skeleton-block h-4 w-[68%] rounded-full" />
-          <div className="mt-2 skeleton-block h-3 w-[84%] rounded-full" />
-          <div className="mt-1.5 skeleton-block h-3 w-[47%] rounded-full" />
+          <div className="skeleton-block h-4 w-[72%] rounded-full" />
+          <div className="mt-2 skeleton-block h-3 w-[88%] rounded-full" />
+          <div className="mt-1.5 skeleton-block h-3 w-[61%] rounded-full" />
         </div>
 
         <div className="flex h-12 w-full shrink-0 items-center justify-between rounded-xl border border-[#eadfd3] bg-white/65 px-4 py-2 md:w-28 lg:h-11 lg:w-24 lg:px-3">
@@ -241,7 +242,7 @@ function ServiceCardSkeleton({ index }: { index: number }) {
 
       <div className="mt-1.5 flex items-center gap-2 text-xs lg:mt-1">
         <div className="skeleton-block h-3.5 w-3.5 rounded-full" />
-        <div className="skeleton-block h-3 w-16 rounded-full" />
+        <div className="skeleton-block h-3 w-24 rounded-full" />
       </div>
     </div>
   );
@@ -1072,24 +1073,43 @@ export default function Page() {
   return (
     <main className="min-h-[100dvh] bg-[#faf8f5] p-2 text-stone-900 sm:p-4 lg:flex lg:items-center lg:justify-center lg:p-8">
       {notification && (
-        <div className="pointer-events-none fixed inset-x-3 top-3 z-[90] flex justify-center md:inset-x-auto md:right-6 md:top-6">
+        <div className="pointer-events-none fixed inset-x-3 bottom-4 z-[90] flex justify-center md:inset-x-auto md:bottom-6 md:right-6">
           <div
             role="status"
             aria-live="polite"
             className={cn(
-              "pointer-events-auto flex max-w-md items-start gap-3 rounded-2xl border px-4 py-3 text-sm shadow-[0_20px_45px_rgba(31,24,19,0.14)] backdrop-blur",
+              "pointer-events-auto flex w-full max-w-md items-start gap-3 rounded-[22px] border px-4 py-3.5 text-sm shadow-[0_20px_45px_rgba(31,24,19,0.14)] backdrop-blur",
               notification.tone === "error"
-                ? "border-red-200 bg-[#fff7f6] text-red-700"
+                ? "border-red-200 bg-[linear-gradient(180deg,_#fff8f7,_#fff3f2)] text-red-700"
                 : "border-emerald-200 bg-[#f5fff8] text-emerald-700",
             )}
           >
             <div
               className={cn(
-                "mt-0.5 h-2.5 w-2.5 shrink-0 rounded-full",
-                notification.tone === "error" ? "bg-red-500" : "bg-emerald-500",
+                "flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl",
+                notification.tone === "error"
+                  ? "bg-red-100 text-red-600"
+                  : "bg-emerald-100 text-emerald-600",
               )}
-            />
-            <p className="leading-5">{notification.message}</p>
+            >
+              <ShieldAlert className="h-4.5 w-4.5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-semibold leading-5">
+                {notification.tone === "error"
+                  ? "Wymagana akceptacja zgód"
+                  : "Gotowe"}
+              </p>
+              <p className="mt-0.5 leading-5 opacity-90">{notification.message}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setNotification(null)}
+              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-current/60 transition hover:bg-white/70 hover:text-current"
+              aria-label="Zamknij powiadomienie"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </div>
         </div>
       )}
@@ -1314,7 +1334,7 @@ export default function Page() {
                           type="button"
                           onClick={() => handleSelectService(service.id)}
                           className={cn(
-                            "group relative w-full min-h-[132px] overflow-hidden rounded-[24px] border p-3 text-left transition-colors duration-200 ease-in-out md:min-h-[134px] md:p-4 lg:h-full lg:rounded-[22px] lg:p-3",
+                            "group relative w-full min-h-[184px] overflow-hidden rounded-[24px] border p-3 text-left transition-colors duration-200 ease-in-out md:min-h-[134px] md:p-4 lg:h-full lg:rounded-[22px] lg:p-3",
                             isSelected &&
                               "border-[#8c6b4a] bg-[#8c6b4a]/5",
                             !isSelected &&
