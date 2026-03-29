@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 
 import {
-  createAvailabilityWindowAction,
+  createAvailabilitySlotAction,
   deleteAvailabilityDayAction,
   deleteAvailabilitySlotAction,
 } from "@/app/admin/actions";
@@ -79,7 +79,7 @@ function PrimarySubmitButton() {
       ) : (
         <>
           <Plus className="mr-2 h-4 w-4" />
-          Dodaj dostępność
+          Dodaj godzinę
         </>
       )}
     </button>
@@ -136,7 +136,7 @@ function DeleteSlotButton() {
 
 function CreateAvailabilityCard() {
   const [state, formAction] = useActionState(
-    createAvailabilityWindowAction,
+    createAvailabilitySlotAction,
     initialAdminActionState,
   );
   const formRef = useRef<HTMLFormElement>(null);
@@ -156,20 +156,20 @@ function CreateAvailabilityCard() {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8c6b4a]">
-            Nowy dzień
+            Nowy slot
           </p>
           <h3 className="mt-1 text-xl font-semibold text-stone-900">
-            Dodaj dostępne sloty do terminarza
+            Dodaj pojedynczą godzinę do grafiku
           </h3>
           <p className="mt-1 text-sm text-stone-600">
-            Wybierz datę, zakres godzin i interwał, a system utworzy wszystkie
-            dostępne starty wizyt.
+            Wybierz datę i konkretną godzinę, a slot od razu trafi do
+            terminarza klienta.
           </p>
         </div>
         <PrimarySubmitButton />
       </div>
 
-      <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-5 grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <label className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-500">
             Data
@@ -183,38 +183,12 @@ function CreateAvailabilityCard() {
 
         <div className="space-y-2">
           <label className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-500">
-            Od godziny
+            Godzina
           </label>
           <input
-            name="startTime"
+            name="time"
             type="time"
             defaultValue="09:00"
-            className="h-11 w-full rounded-2xl border border-stone-200 bg-white px-4 text-sm text-stone-900 outline-none transition focus:border-[#8c6b4a] focus:ring-4 focus:ring-[#f4e5d5]"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-500">
-            Do godziny
-          </label>
-          <input
-            name="endTime"
-            type="time"
-            defaultValue="15:00"
-            className="h-11 w-full rounded-2xl border border-stone-200 bg-white px-4 text-sm text-stone-900 outline-none transition focus:border-[#8c6b4a] focus:ring-4 focus:ring-[#f4e5d5]"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-500">
-            Interwał (min)
-          </label>
-          <input
-            name="intervalMinutes"
-            type="number"
-            min="1"
-            step="1"
-            defaultValue="15"
             className="h-11 w-full rounded-2xl border border-stone-200 bg-white px-4 text-sm text-stone-900 outline-none transition focus:border-[#8c6b4a] focus:ring-4 focus:ring-[#f4e5d5]"
           />
         </div>
@@ -245,7 +219,12 @@ function ScheduleDayCard({ day }: { day: AvailabilityDay }) {
           </h3>
           <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-600">
             <CalendarDays className="h-3.5 w-3.5 text-[#8c6b4a]" />
-            {day.slots.length} slot{day.slots.length === 1 ? "" : day.slots.length < 5 ? "y" : "ów"}
+            {day.slots.length}{" "}
+            {day.slots.length === 1
+              ? "slot"
+              : day.slots.length < 5
+                ? "sloty"
+                : "slotów"}
           </div>
         </div>
 

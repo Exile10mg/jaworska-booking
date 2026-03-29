@@ -823,6 +823,69 @@ export async function createAvailabilityWindowAction(
   }
 }
 
+export async function createAvailabilitySlotAction(
+  _prevState: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  await requireAuthenticatedAdmin();
+
+  const rawDate = formData.get("date");
+  const rawTime = formData.get("time");
+  const date =
+    typeof rawDate === "string" ? normalizeDateKey(rawDate) : null;
+  const time =
+    typeof rawTime === "string" ? normalizeTimeValue(rawTime) : null;
+
+  if (!date) {
+    return {
+      status: "error",
+      message: "Wybierz datę dostępności.",
+    };
+  }
+
+  if (!time) {
+    return {
+      status: "error",
+      message: "Podaj poprawną godzinę slotu.",
+    };
+  }
+
+  try {
+    const db = getDb();
+    const insertedSlots = await db
+      .insert(availabilitySlots)
+      .values({
+        slotDate: date,
+        slotTime: time,
+      })
+      .onConflictDoNothing()
+      .returning({ id: availabilitySlots.id });
+
+    revalidatePath("/admin");
+    revalidatePath("/admin/terminarz");
+    revalidatePath("/");
+
+    if (insertedSlots.length === 0) {
+      return {
+        status: "success",
+        message: `Godzina ${time} dla dnia ${date} już jest w terminarzu.`,
+      };
+    }
+
+    return {
+      status: "success",
+      message: `Dodano godzinę ${time} dla dnia ${date}.`,
+    };
+  } catch (error) {
+    console.error("Create availability slot action error:", error);
+
+    return {
+      status: "error",
+      message: "Nie udało się dodać godziny do terminarza. Spróbuj ponownie.",
+    };
+  }
+}
+
 export async function deleteAvailabilitySlotAction(
   _prevState: AdminActionState,
   formData: FormData,
