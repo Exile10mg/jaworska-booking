@@ -21,6 +21,7 @@ import {
 import { requireAuthenticatedAdmin } from "@/lib/admin-auth";
 import {
   buildSlotsFromRange,
+  isFutureSlot,
   normalizeDateKey,
   normalizeTimeValue,
 } from "@/lib/availability";
@@ -157,13 +158,63 @@ export async function updateBookingStatusAction(formData: FormData) {
   }
 
   const db = getDb();
+  const [currentBooking] = await db
+    .select({
+      id: bookings.id,
+      appointmentDate: bookings.appointmentDate,
+      appointmentTime: bookings.appointmentTime,
+      status: bookings.status,
+    })
+    .from(bookings)
+    .where(eq(bookings.id, bookingId))
+    .limit(1);
+
+  if (!currentBooking) {
+    return;
+  }
+
   await db
     .update(bookings)
     .set({ status: status as BookingStatus })
     .where(eq(bookings.id, bookingId));
 
+  const shouldTouchAvailability = isFutureSlot(
+    currentBooking.appointmentDate,
+    currentBooking.appointmentTime,
+  );
+
+  if (shouldTouchAvailability) {
+    const isTransitionToCancelled =
+      currentBooking.status !== "cancelled" && status === "cancelled";
+    const isTransitionFromCancelled =
+      currentBooking.status === "cancelled" && status !== "cancelled";
+
+    if (isTransitionToCancelled) {
+      await db
+        .insert(availabilitySlots)
+        .values({
+          slotDate: currentBooking.appointmentDate,
+          slotTime: currentBooking.appointmentTime,
+        })
+        .onConflictDoNothing();
+    }
+
+    if (isTransitionFromCancelled) {
+      await db
+        .delete(availabilitySlots)
+        .where(
+          and(
+            eq(availabilitySlots.slotDate, currentBooking.appointmentDate),
+            eq(availabilitySlots.slotTime, currentBooking.appointmentTime),
+          ),
+        );
+    }
+  }
+
   revalidatePath("/admin");
   revalidatePath("/admin/rezerwacje");
+  revalidatePath("/admin/terminarz");
+  revalidatePath("/");
 }
 
 export async function deleteBookingAction(
@@ -200,13 +251,20 @@ export async function deleteBookingAction(
       };
     }
 
-    await db
-      .insert(availabilitySlots)
-      .values({
-        slotDate: deletedBooking.appointmentDate,
-        slotTime: deletedBooking.appointmentTime,
-      })
-      .onConflictDoNothing();
+    if (
+      isFutureSlot(
+        deletedBooking.appointmentDate,
+        deletedBooking.appointmentTime,
+      )
+    ) {
+      await db
+        .insert(availabilitySlots)
+        .values({
+          slotDate: deletedBooking.appointmentDate,
+          slotTime: deletedBooking.appointmentTime,
+        })
+        .onConflictDoNothing();
+    }
 
     revalidatePath("/admin");
     revalidatePath("/admin/rezerwacje");

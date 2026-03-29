@@ -26,6 +26,27 @@ export function getMinutesFromTime(time: string) {
   return hour * 60 + minute;
 }
 
+function getWarsawNowParts() {
+  const formatter = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Europe/Warsaw",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+
+  const parts = formatter.formatToParts(new Date());
+  const getValue = (type: string) =>
+    parts.find((part) => part.type === type)?.value ?? "";
+
+  return {
+    date: `${getValue("year")}-${getValue("month")}-${getValue("day")}`,
+    time: `${getValue("hour")}:${getValue("minute")}`,
+  };
+}
+
 export function normalizeDateKey(value: string) {
   const normalized = value.trim();
 
@@ -57,6 +78,15 @@ export function normalizeTimeValue(value: string) {
   }
 
   return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+}
+
+export function isFutureSlot(date: string, time: string) {
+  const now = getWarsawNowParts();
+
+  if (date > now.date) return true;
+  if (date < now.date) return false;
+
+  return time > now.time;
 }
 
 export function buildSlotsFromRange(
