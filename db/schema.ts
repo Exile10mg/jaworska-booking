@@ -75,6 +75,32 @@ export const adminUsers = pgTable(
   ],
 );
 
+export const adminLoginAttempts = pgTable(
+  "admin_login_attempts",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    email: varchar("email", { length: 255 }).notNull(),
+    ipAddress: varchar("ip_address", { length: 128 }).notNull(),
+    failedAttempts: integer("failed_attempts").notNull().default(0),
+    lockedUntil: timestamp("locked_until", { withTimezone: true }),
+    lastAttemptAt: timestamp("last_attempt_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("admin_login_attempts_email_ip_unique").on(
+      table.email,
+      table.ipAddress,
+    ),
+    index("admin_login_attempts_locked_until_idx").on(table.lockedUntil),
+    index("admin_login_attempts_updated_at_idx").on(table.updatedAt),
+  ],
+);
+
 export const services = pgTable(
   "services",
   {

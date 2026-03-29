@@ -1,13 +1,15 @@
-"use server";
+﻿"use server";
 
 import { compare } from "bcryptjs";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { type AdminActionState } from "@/app/admin/action-state";
 import { getDb } from "@/db/client";
 import {
+  adminLoginAttempts,
   adminUsers,
   availabilitySlots,
   bookings,
@@ -44,6 +46,10 @@ const allowedBookingStatuses = new Set<BookingStatus>([
   "confirmed",
   "cancelled",
 ]);
+const MAX_ADMIN_LOGIN_ATTEMPTS = 5;
+const ADMIN_LOGIN_LOCK_MINUTES = 15;
+const DUMMY_PASSWORD_HASH =
+  "$2a$10$7EqJtq98hPqEX7fNZaFWoOhiJxYqV1CmvY/fx/n6PvJEa3QgUnIF6";
 
 function slugifyServiceId(value: string) {
   return value
@@ -97,6 +103,98 @@ function validateServiceFields({
   }
 
   return null;
+}
+
+function getClientIpAddress(headerStore: Headers) {
+  const forwardedFor = headerStore.get("x-forwarded-for");
+  const realIp = headerStore.get("x-real-ip");
+
+  if (forwardedFor) {
+    const [firstIp] = forwardedFor.split(",");
+    const normalizedIp = firstIp?.trim();
+    if (normalizedIp) return normalizedIp.slice(0, 128);
+  }
+
+  if (realIp) {
+    return realIp.trim().slice(0, 128);
+  }
+
+  return "unknown";
+}
+
+async function getAdminLoginAttempt(email: string, ipAddress: string) {
+  const db = getDb();
+  const [attempt] = await db
+    .select({
+      id: adminLoginAttempts.id,
+      failedAttempts: adminLoginAttempts.failedAttempts,
+      lockedUntil: adminLoginAttempts.lockedUntil,
+    })
+    .from(adminLoginAttempts)
+    .where(
+      and(
+        eq(adminLoginAttempts.email, email),
+        eq(adminLoginAttempts.ipAddress, ipAddress),
+      ),
+    )
+    .limit(1);
+
+  return attempt ?? null;
+}
+
+async function clearAdminLoginAttempt(email: string, ipAddress: string) {
+  const db = getDb();
+  await db
+    .delete(adminLoginAttempts)
+    .where(
+      and(
+        eq(adminLoginAttempts.email, email),
+        eq(adminLoginAttempts.ipAddress, ipAddress),
+      ),
+    );
+}
+
+async function registerFailedAdminLoginAttempt(email: string, ipAddress: string) {
+  const db = getDb();
+  const now = new Date();
+  const currentAttempt = await getAdminLoginAttempt(email, ipAddress);
+  const nextFailedAttempts = (currentAttempt?.failedAttempts ?? 0) + 1;
+  const lockedUntil =
+    nextFailedAttempts >= MAX_ADMIN_LOGIN_ATTEMPTS
+      ? new Date(now.getTime() + ADMIN_LOGIN_LOCK_MINUTES * 60 * 1000)
+      : null;
+
+  if (!currentAttempt) {
+    await db.insert(adminLoginAttempts).values({
+      email,
+      ipAddress,
+      failedAttempts: nextFailedAttempts,
+      lockedUntil,
+      lastAttemptAt: now,
+      updatedAt: now,
+    });
+
+    return lockedUntil;
+  }
+
+  await db
+    .update(adminLoginAttempts)
+    .set({
+      failedAttempts: nextFailedAttempts,
+      lockedUntil,
+      lastAttemptAt: now,
+      updatedAt: now,
+    })
+    .where(eq(adminLoginAttempts.id, currentAttempt.id));
+
+  return lockedUntil;
+}
+
+function getLockMessage(lockedUntil: Date) {
+  const remainingMs = lockedUntil.getTime() - Date.now();
+  const remainingMinutes = Math.max(1, Math.ceil(remainingMs / (60 * 1000)));
+
+  return `Zbyt wiele nieudanych prób logowania. Spróbuj ponownie za około ${remainingMinutes} min.`;
 }
 
 async function clearBookingReminder({
@@ -186,10 +284,12 @@ export async function loginAdminAction(
   _prevState: { error: string | null },
   formData: FormData,
 ): Promise<{ error: string | null }> {
+  const headerStore = await headers();
   const rawEmail = formData.get("email");
   const rawPassword = formData.get("password");
   const email = typeof rawEmail === "string" ? rawEmail.trim().toLowerCase() : "";
   const password = typeof rawPassword === "string" ? rawPassword : "";
+  const ipAddress = getClientIpAddress(headerStore);
 
   if (!process.env.ADMIN_SESSION_SECRET) {
     return {
@@ -203,6 +303,21 @@ export async function loginAdminAction(
     };
   }
 
+  const activeAttempt = await getAdminLoginAttempt(email, ipAddress);
+
+  if (
+    activeAttempt?.lockedUntil &&
+    activeAttempt.lockedUntil.getTime() > Date.now()
+  ) {
+    return {
+      error: getLockMessage(activeAttempt.lockedUntil),
+    };
+  }
+
+  if (activeAttempt?.lockedUntil) {
+    await clearAdminLoginAttempt(email, ipAddress);
+  }
+
   const db = getDb();
   const [admin] = await db
     .select({
@@ -214,19 +329,21 @@ export async function loginAdminAction(
     .where(eq(adminUsers.email, email))
     .limit(1);
 
-  if (!admin) {
+  const passwordMatches = admin
+    ? await compare(password, admin.passwordHash)
+    : await compare(password, DUMMY_PASSWORD_HASH);
+
+  if (!admin || !passwordMatches) {
+    const lockedUntil = await registerFailedAdminLoginAttempt(email, ipAddress);
+
     return {
-      error: "Nieprawidłowy e-mail lub hasło.",
+      error: lockedUntil
+        ? getLockMessage(lockedUntil)
+        : "Nieprawidłowy e-mail lub hasło.",
     };
   }
 
-  const passwordMatches = await compare(password, admin.passwordHash);
-
-  if (!passwordMatches) {
-    return {
-      error: "Nieprawidłowy e-mail lub hasło.",
-    };
-  }
+  await clearAdminLoginAttempt(email, ipAddress);
 
   await createAdminSession({
     adminId: admin.id,
@@ -1179,3 +1296,4 @@ export async function updateLegalDocumentAction(
     };
   }
 }
+

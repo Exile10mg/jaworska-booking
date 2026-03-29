@@ -1,8 +1,17 @@
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 import { logoutAdminAction } from "@/app/admin/actions";
 import { AdminNav } from "@/app/admin/(protected)/admin-nav";
 import { requireAuthenticatedAdmin } from "@/lib/admin-auth";
+
+export const dynamic = "force-dynamic";
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default async function AdminProtectedLayout({
   children,
