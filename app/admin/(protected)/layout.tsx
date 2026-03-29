@@ -14,7 +14,7 @@ export default async function AdminProtectedLayout({
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,_#f8f3ed,_#fcfaf8)] px-4 py-6 text-stone-900 sm:px-5 lg:px-8">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-        <header className="rounded-[28px] border border-[#ead8c6] bg-white px-5 py-4 shadow-[0_18px_50px_rgba(166,130,95,0.12)] sm:px-6">
+        <header className="animate-admin-shell rounded-[28px] border border-[#ead8c6] bg-white px-5 py-4 shadow-[0_18px_50px_rgba(166,130,95,0.12)] sm:px-6">
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div>
@@ -43,7 +43,7 @@ export default async function AdminProtectedLayout({
           </div>
         </header>
 
-        {children}
+        <div className="animate-admin-content">{children}</div>
       </div>
     </main>
   );

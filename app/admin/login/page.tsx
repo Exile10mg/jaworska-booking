@@ -15,8 +15,8 @@ export default async function AdminLoginPage() {
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,_#f8f3ed,_#fcfaf8)] px-4 py-10 text-stone-900">
       <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-5xl items-center justify-center">
-        <div className="grid w-full overflow-hidden rounded-[32px] border border-[#ead8c6] bg-white shadow-[0_30px_90px_rgba(166,130,95,0.18)] lg:grid-cols-[1.05fr_0.95fr]">
-          <div className="hidden bg-[radial-gradient(circle_at_top,_rgba(199,153,99,0.28),_transparent_50%),linear-gradient(180deg,_#fff8f1,_#fffdf9)] p-10 lg:block">
+        <div className="animate-admin-shell grid w-full overflow-hidden rounded-[32px] border border-[#ead8c6] bg-white shadow-[0_30px_90px_rgba(166,130,95,0.18)] lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="animate-admin-content hidden bg-[radial-gradient(circle_at_top,_rgba(199,153,99,0.28),_transparent_50%),linear-gradient(180deg,_#fff8f1,_#fffdf9)] p-10 lg:block">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#8c6b4a]">
               Panel administracyjny
             </p>
@@ -29,7 +29,7 @@ export default async function AdminLoginPage() {
             </p>
           </div>
 
-          <div className="p-6 sm:p-8 lg:p-10">
+          <div className="animate-admin-content p-6 sm:p-8 lg:p-10">
             <div className="mx-auto max-w-md">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#8c6b4a]">
                 Logowanie
