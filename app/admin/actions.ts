@@ -27,10 +27,12 @@ import {
   normalizeTimeValue,
 } from "@/lib/availability";
 import {
+  cancelScheduledBookingReminderSms,
   sendBookingCancelledSms,
   sendBookingConfirmedSms,
   sendBookingDeletedSms,
   sendBookingRescheduledSms,
+  scheduleBookingReminderSms,
 } from "@/lib/sms-notifications";
 import {
   legalDocumentKeys,
@@ -95,6 +97,89 @@ function validateServiceFields({
   }
 
   return null;
+}
+
+async function clearBookingReminder({
+  bookingId,
+  reminderSmsSid,
+}: {
+  bookingId: string;
+  reminderSmsSid?: string | null;
+}) {
+  if (reminderSmsSid) {
+    try {
+      await cancelScheduledBookingReminderSms(reminderSmsSid);
+    } catch (error) {
+      console.error("Cancel booking reminder SMS error:", error);
+    }
+  }
+
+  const db = getDb();
+  await db
+    .update(bookings)
+    .set({
+      reminderSmsSid: null,
+      reminderScheduledFor: null,
+    })
+    .where(eq(bookings.id, bookingId));
+}
+
+async function syncConfirmedBookingReminder({
+  bookingId,
+  serviceName,
+  appointmentDate,
+  appointmentTime,
+  customerName,
+  customerPhone,
+  price,
+  previousReminderSmsSid,
+}: {
+  bookingId: string;
+  serviceName: string;
+  appointmentDate: string;
+  appointmentTime: string;
+  customerName: string;
+  customerPhone: string;
+  price: number | null;
+  previousReminderSmsSid?: string | null;
+}) {
+  if (previousReminderSmsSid) {
+    try {
+      await cancelScheduledBookingReminderSms(previousReminderSmsSid);
+    } catch (error) {
+      console.error("Cancel previous booking reminder SMS error:", error);
+    }
+  }
+
+  let reminderSmsSid: string | null = null;
+  let reminderScheduledFor: Date | null = null;
+
+  try {
+    const scheduledReminder = await scheduleBookingReminderSms({
+      serviceName,
+      appointmentDate,
+      appointmentTime,
+      customerName,
+      customerPhone,
+      price,
+    });
+
+    if (scheduledReminder) {
+      reminderSmsSid = scheduledReminder.sid;
+      reminderScheduledFor = scheduledReminder.sendAt;
+    }
+  } catch (error) {
+    console.error("Schedule booking reminder SMS error:", error);
+  }
+
+  const db = getDb();
+  await db
+    .update(bookings)
+    .set({
+      reminderSmsSid,
+      reminderScheduledFor,
+    })
+    .where(eq(bookings.id, bookingId));
 }
 
 export async function loginAdminAction(
@@ -179,6 +264,7 @@ export async function updateBookingStatusAction(formData: FormData) {
       customerPhone: bookings.customerPhone,
       price: bookings.price,
       status: bookings.status,
+      reminderSmsSid: bookings.reminderSmsSid,
     })
     .from(bookings)
     .where(eq(bookings.id, bookingId))
@@ -227,6 +313,13 @@ export async function updateBookingStatusAction(formData: FormData) {
   }
 
   if (currentBooking.status !== status) {
+    if (currentBooking.status === "confirmed" && status !== "confirmed") {
+      await clearBookingReminder({
+        bookingId,
+        reminderSmsSid: currentBooking.reminderSmsSid,
+      });
+    }
+
     try {
       if (status === "confirmed") {
         await sendBookingConfirmedSms({
@@ -236,6 +329,17 @@ export async function updateBookingStatusAction(formData: FormData) {
           customerName: currentBooking.customerName,
           customerPhone: currentBooking.customerPhone,
           price: currentBooking.price,
+        });
+
+        await syncConfirmedBookingReminder({
+          bookingId,
+          serviceName: currentBooking.serviceName,
+          appointmentDate: currentBooking.appointmentDate,
+          appointmentTime: currentBooking.appointmentTime,
+          customerName: currentBooking.customerName,
+          customerPhone: currentBooking.customerPhone,
+          price: currentBooking.price,
+          previousReminderSmsSid: currentBooking.reminderSmsSid,
         });
       }
 
@@ -338,6 +442,7 @@ export async function updateBookingDetailsAction(
       customerPhone: bookings.customerPhone,
       notes: bookings.notes,
       status: bookings.status,
+      reminderSmsSid: bookings.reminderSmsSid,
     })
     .from(bookings)
     .where(eq(bookings.id, bookingId))
@@ -370,6 +475,12 @@ export async function updateBookingDetailsAction(
   const slotChanged =
     currentBooking.appointmentDate !== appointmentDate ||
     currentBooking.appointmentTime !== appointmentTime;
+  const reminderPayloadChanged =
+    slotChanged ||
+    currentBooking.serviceId !== selectedService.id ||
+    currentBooking.customerName !== customerName ||
+    currentBooking.customerPhone !== customerPhone ||
+    currentBooking.price !== selectedService.price;
   const bookingKeepsSlotReserved = currentBooking.status !== "cancelled";
   let reservedNewSlot = false;
 
@@ -421,6 +532,19 @@ export async function updateBookingDetailsAction(
           slotTime: currentBooking.appointmentTime,
         })
         .onConflictDoNothing();
+    }
+
+    if (currentBooking.status === "confirmed" && reminderPayloadChanged) {
+      await syncConfirmedBookingReminder({
+        bookingId,
+        serviceName: selectedService.name,
+        appointmentDate,
+        appointmentTime,
+        customerName,
+        customerPhone,
+        price: selectedService.price,
+        previousReminderSmsSid: currentBooking.reminderSmsSid,
+      });
     }
 
     if (slotChanged && currentBooking.status !== "cancelled") {
@@ -496,6 +620,7 @@ export async function deleteBookingAction(
         customerName: bookings.customerName,
         customerPhone: bookings.customerPhone,
         price: bookings.price,
+        reminderSmsSid: bookings.reminderSmsSid,
       });
 
     if (!deletedBooking) {
@@ -518,6 +643,17 @@ export async function deleteBookingAction(
           slotTime: deletedBooking.appointmentTime,
         })
         .onConflictDoNothing();
+    }
+
+    if (deletedBooking.reminderSmsSid) {
+      try {
+        await cancelScheduledBookingReminderSms(deletedBooking.reminderSmsSid);
+      } catch (notificationError) {
+        console.error(
+          "Booking reminder cancellation on delete error:",
+          notificationError,
+        );
+      }
     }
 
     try {

@@ -34,6 +34,10 @@ export const bookings = pgTable(
     customerPhone: text("customer_phone").notNull(),
     notes: text("notes").notNull().default(""),
     status: bookingStatusEnum("status").notNull().default("pending"),
+    reminderSmsSid: text("reminder_sms_sid"),
+    reminderScheduledFor: timestamp("reminder_scheduled_for", {
+      withTimezone: true,
+    }),
     paymentMethod: paymentMethodEnum("payment_method")
       .notNull()
       .default("cash_on_site"),
@@ -47,6 +51,7 @@ export const bookings = pgTable(
       table.appointmentTime,
     ),
     index("bookings_created_at_idx").on(table.createdAt),
+    index("bookings_reminder_scheduled_for_idx").on(table.reminderScheduledFor),
   ],
 );
 
