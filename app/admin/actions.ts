@@ -258,6 +258,198 @@ export async function updateBookingStatusAction(formData: FormData) {
   revalidatePath("/");
 }
 
+export async function updateBookingDetailsAction(
+  _prevState: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  await requireAuthenticatedAdmin();
+
+  const rawBookingId = formData.get("bookingId");
+  const rawServiceId = formData.get("serviceId");
+  const rawCustomerName = formData.get("customerName");
+  const rawCustomerPhone = formData.get("customerPhone");
+  const rawAppointmentDate = formData.get("appointmentDate");
+  const rawAppointmentTime = formData.get("appointmentTime");
+  const rawNotes = formData.get("notes");
+
+  const bookingId = typeof rawBookingId === "string" ? rawBookingId : "";
+  const serviceId = typeof rawServiceId === "string" ? rawServiceId : "";
+  const customerName =
+    typeof rawCustomerName === "string" ? rawCustomerName.trim() : "";
+  const customerPhone =
+    typeof rawCustomerPhone === "string" ? rawCustomerPhone.trim() : "";
+  const appointmentDate =
+    typeof rawAppointmentDate === "string"
+      ? normalizeDateKey(rawAppointmentDate)
+      : null;
+  const appointmentTime =
+    typeof rawAppointmentTime === "string"
+      ? normalizeTimeValue(rawAppointmentTime)
+      : null;
+  const notes = typeof rawNotes === "string" ? rawNotes.trim() : "";
+
+  if (!bookingId) {
+    return {
+      status: "error",
+      message: "Nie znaleziono rezerwacji do edycji.",
+    };
+  }
+
+  if (!serviceId) {
+    return {
+      status: "error",
+      message: "Wybierz usługę.",
+    };
+  }
+
+  if (!customerName) {
+    return {
+      status: "error",
+      message: "Podaj imię i nazwisko klientki.",
+    };
+  }
+
+  if (!customerPhone) {
+    return {
+      status: "error",
+      message: "Podaj numer telefonu klientki.",
+    };
+  }
+
+  if (!appointmentDate || !appointmentTime) {
+    return {
+      status: "error",
+      message: "Wybierz poprawny termin wizyty.",
+    };
+  }
+
+  const db = getDb();
+  const [currentBooking] = await db
+    .select({
+      id: bookings.id,
+      serviceId: bookings.serviceId,
+      serviceName: bookings.serviceName,
+      price: bookings.price,
+      appointmentDate: bookings.appointmentDate,
+      appointmentTime: bookings.appointmentTime,
+      customerName: bookings.customerName,
+      customerPhone: bookings.customerPhone,
+      notes: bookings.notes,
+      status: bookings.status,
+    })
+    .from(bookings)
+    .where(eq(bookings.id, bookingId))
+    .limit(1);
+
+  if (!currentBooking) {
+    return {
+      status: "error",
+      message: "Ta rezerwacja już nie istnieje.",
+    };
+  }
+
+  const [selectedService] = await db
+    .select({
+      id: services.id,
+      name: services.name,
+      price: services.price,
+    })
+    .from(services)
+    .where(eq(services.id, serviceId))
+    .limit(1);
+
+  if (!selectedService) {
+    return {
+      status: "error",
+      message: "Wybrana usługa nie istnieje.",
+    };
+  }
+
+  const slotChanged =
+    currentBooking.appointmentDate !== appointmentDate ||
+    currentBooking.appointmentTime !== appointmentTime;
+  const bookingKeepsSlotReserved = currentBooking.status !== "cancelled";
+  let reservedNewSlot = false;
+
+  try {
+    if (slotChanged && bookingKeepsSlotReserved) {
+      const [slotRow] = await db
+        .delete(availabilitySlots)
+        .where(
+          and(
+            eq(availabilitySlots.slotDate, appointmentDate),
+            eq(availabilitySlots.slotTime, appointmentTime),
+          ),
+        )
+        .returning({ id: availabilitySlots.id });
+
+      if (!slotRow) {
+        return {
+          status: "error",
+          message: "Wybrany termin nie jest już dostępny.",
+        };
+      }
+
+      reservedNewSlot = true;
+    }
+
+    await db
+      .update(bookings)
+      .set({
+        serviceId: selectedService.id,
+        serviceName: selectedService.name,
+        price: selectedService.price,
+        appointmentDate,
+        appointmentTime,
+        customerName,
+        customerPhone,
+        notes,
+      })
+      .where(eq(bookings.id, bookingId));
+
+    if (
+      slotChanged &&
+      bookingKeepsSlotReserved &&
+      isFutureSlot(currentBooking.appointmentDate, currentBooking.appointmentTime)
+    ) {
+      await db
+        .insert(availabilitySlots)
+        .values({
+          slotDate: currentBooking.appointmentDate,
+          slotTime: currentBooking.appointmentTime,
+        })
+        .onConflictDoNothing();
+    }
+
+    revalidatePath("/admin");
+    revalidatePath("/admin/rezerwacje");
+    revalidatePath("/admin/terminarz");
+    revalidatePath("/");
+
+    return {
+      status: "success",
+      message: "Rezerwacja została zaktualizowana.",
+    };
+  } catch (error) {
+    if (reservedNewSlot) {
+      await db
+        .insert(availabilitySlots)
+        .values({
+          slotDate: appointmentDate,
+          slotTime: appointmentTime,
+        })
+        .onConflictDoNothing();
+    }
+
+    console.error("Update booking details action error:", error);
+
+    return {
+      status: "error",
+      message: "Nie udało się zapisać zmian w rezerwacji.",
+    };
+  }
+}
+
 export async function deleteBookingAction(
   _prevState: AdminActionState,
   formData: FormData,

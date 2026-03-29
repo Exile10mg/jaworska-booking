@@ -1,10 +1,12 @@
-import { desc } from "drizzle-orm";
+import { asc, desc } from "drizzle-orm";
 
 import { updateBookingStatusAction } from "@/app/admin/actions";
 import { getDb } from "@/db/client";
-import { bookings } from "@/db/schema";
+import { bookings, services } from "@/db/schema";
+import { getAvailabilityDays } from "@/lib/availability";
 
 import { DeleteBookingButton } from "./delete-booking-button";
+import { EditBookingForm } from "./edit-booking-form";
 
 export const dynamic = "force-dynamic";
 
@@ -35,6 +37,7 @@ export default async function AdminBookingsPage() {
   const bookingRows = await db
     .select({
       id: bookings.id,
+      serviceId: bookings.serviceId,
       serviceName: bookings.serviceName,
       appointmentDate: bookings.appointmentDate,
       appointmentTime: bookings.appointmentTime,
@@ -47,6 +50,15 @@ export default async function AdminBookingsPage() {
     })
     .from(bookings)
     .orderBy(desc(bookings.createdAt));
+  const serviceRows = await db
+    .select({
+      id: services.id,
+      name: services.name,
+      price: services.price,
+    })
+    .from(services)
+    .orderBy(asc(services.sortOrder), asc(services.name));
+  const availabilityDays = await getAvailabilityDays();
 
   const pendingCount = bookingRows.filter((row) => row.status === "pending").length;
   const confirmedCount = bookingRows.filter(
@@ -169,6 +181,21 @@ export default async function AdminBookingsPage() {
                           {booking.notes.trim() || "Brak dodatkowych uwag."}
                         </p>
                       </div>
+
+                      <EditBookingForm
+                        booking={{
+                          id: booking.id,
+                          serviceId: booking.serviceId,
+                          appointmentDate: booking.appointmentDate,
+                          appointmentTime: booking.appointmentTime,
+                          customerName: booking.customerName,
+                          customerPhone: booking.customerPhone,
+                          notes: booking.notes,
+                          status: booking.status,
+                        }}
+                        services={serviceRows}
+                        availabilityDays={availabilityDays}
+                      />
                     </div>
 
                     <div className="lg:w-[280px]">
