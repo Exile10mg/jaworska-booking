@@ -72,6 +72,8 @@ type BookedSummary = {
   time: string;
 };
 
+const SERVICES_LOADING_MIN_DURATION_MS = 2400;
+
 const phoneCountries: CountryOption[] = [
   { iso: "PL", name: "Polska", dialCode: "48", flag: "🇵🇱" },
   { iso: "DE", name: "Niemcy", dialCode: "49", flag: "🇩🇪" },
@@ -797,6 +799,8 @@ export default function Page() {
     let cancelled = false;
 
     async function loadServices() {
+      const loadingStartedAt = Date.now();
+
       try {
         setIsServicesLoading(true);
         setServicesError(null);
@@ -820,6 +824,16 @@ export default function Page() {
         setServices([]);
         setServicesError("Nie udało się pobrać listy usług. Odśwież stronę.");
       } finally {
+        const elapsed = Date.now() - loadingStartedAt;
+        const remaining = Math.max(
+          0,
+          SERVICES_LOADING_MIN_DURATION_MS - elapsed,
+        );
+
+        if (remaining > 0) {
+          await new Promise((resolve) => setTimeout(resolve, remaining));
+        }
+
         if (!cancelled) {
           setIsServicesLoading(false);
         }
