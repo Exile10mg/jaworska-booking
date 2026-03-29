@@ -634,6 +634,14 @@ export default function Page() {
 
   function handleContinueToContact() {
     if (!selectedDate || !selectedTime) return;
+    if (!availableTimeSlots.includes(selectedTime)) {
+      setSelectedTime(null);
+      setSubmitError("Wybrany termin nie jest już dostępny. Wybierz nową godzinę.");
+      setStep(2);
+      return;
+    }
+
+    setSubmitError(null);
     setStep(3);
   }
 
@@ -749,10 +757,26 @@ export default function Page() {
     };
   }, []);
 
+  const loadAvailability = useCallback(async () => {
+    const response = await fetch("/api/availability", {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw new Error("Nie udało się pobrać dostępności.");
+    }
+
+    const data = (await response.json()) as {
+      availability?: AvailabilityMap;
+    };
+
+    setAvailability(data.availability ?? {});
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
 
-    async function loadAvailability() {
+    async function syncAvailability() {
       try {
         setIsAvailabilityLoading(true);
         setAvailabilityError(null);
@@ -786,7 +810,7 @@ export default function Page() {
       }
     }
 
-    void loadAvailability();
+    void syncAvailability();
 
     return () => {
       cancelled = true;
@@ -813,10 +837,6 @@ export default function Page() {
         setSelectedTimePeriod("morning");
       }
       return;
-    }
-
-    if (getTimeSlotsByPeriod(slotsForSelectedDate, selectedTimePeriod).length === 0) {
-      setSelectedTimePeriod(getDefaultTimePeriod(slotsForSelectedDate));
     }
   }, [availability, selectedDate, selectedTime, selectedTimePeriod]);
 
@@ -1495,6 +1515,12 @@ export default function Page() {
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
+
+              {submitError && (
+                <p className="mt-2 text-center text-sm font-medium text-red-600">
+                  {submitError}
+                </p>
+              )}
             </div>
           )}
 
@@ -1852,6 +1878,24 @@ export default function Page() {
                       setIsBooked(true);
                     } catch (error) {
                       console.error(error);
+                      if (
+                        error instanceof Error &&
+                        error.message === "Wybrany termin nie jest już dostępny."
+                      ) {
+                        try {
+                          await loadAvailability();
+                        } catch (refreshError) {
+                          console.error(refreshError);
+                        }
+
+                        setSelectedTime(null);
+                        setStep(2);
+                        setSubmitError(
+                          "Wybrany termin nie jest już dostępny. Wybierz nową godzinę.",
+                        );
+                        return;
+                      }
+
                       setSubmitError(
                         error instanceof Error
                           ? error.message
