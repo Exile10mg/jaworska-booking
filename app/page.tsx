@@ -2076,8 +2076,14 @@ export default function Page() {
                   disabled={isSubmitting}
                   className={bottomPrimaryButtonClass}
                 >
-                  {!isSubmitting && <Check className="h-4 w-4" />}
-                  {isSubmitting ? "Zapisywanie..." : "Potwierdź rezerwację"}
+                  <span className="flex-1 text-center">
+                    {isSubmitting ? "Zapisywanie..." : "Potwierdź rezerwację"}
+                  </span>
+                  {!isSubmitting && (
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-stone-900">
+                      <Check className="h-4 w-4" />
+                    </span>
+                  )}
                 </button>
               </div>
 
