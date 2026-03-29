@@ -4,6 +4,7 @@ import twilio from "twilio";
 
 import {
   CONTACT_PHONE_DISPLAY,
+  CONTACT_PHONE_E164,
 } from "@/lib/contact-details";
 
 type BookingSmsPayload = {
@@ -130,4 +131,20 @@ export async function sendBookingDeletedSms(payload: BookingSmsPayload) {
   ].join(" ");
 
   await sendSms(payload.customerPhone, body);
+}
+
+export async function sendAdminNewBookingSms(payload: BookingSmsPayload) {
+  const notesLine = payload.customerPhone
+    ? `Telefon klientki: ${payload.customerPhone}.`
+    : "";
+  const body = [
+    "Jaworska Beauty: wpłynęła nowa rezerwacja oczekująca na potwierdzenie.",
+    `${payload.customerName} - ${payload.serviceName}.`,
+    `${formatBookingDate(payload.appointmentDate)}, godz. ${payload.appointmentTime}.`,
+    notesLine,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  await sendSms(CONTACT_PHONE_E164, body);
 }
