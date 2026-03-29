@@ -202,6 +202,65 @@ function SuccessStep({ serviceName, dateLabel, time, onReset }: SuccessStepProps
   );
 }
 
+function ServiceCardSkeleton({ index }: { index: number }) {
+  return (
+    <div
+      className="loading-sheen animate-card-enter relative overflow-hidden rounded-[24px] border border-stone-200 bg-[linear-gradient(180deg,_#fffdfa_0%,_#fff8f2_100%)] p-3 md:p-4 lg:rounded-[22px] lg:p-3"
+      style={{ animationDelay: `${index * 60}ms` }}
+      aria-hidden="true"
+    >
+      <div className="flex flex-col items-start justify-between gap-2.5 md:flex-row md:items-center md:gap-3 lg:gap-2">
+        <div className="min-w-0 flex-1 pr-3 lg:pr-2">
+          <div className="skeleton-block h-4 w-4/5 rounded-full" />
+          <div className="mt-2 skeleton-block h-3 w-full rounded-full" />
+          <div className="mt-1.5 skeleton-block h-3 w-2/3 rounded-full" />
+        </div>
+
+        <div className="w-full shrink-0 rounded-xl border border-[#eadfd3] bg-white/80 px-4 py-2 md:w-28 lg:h-11 lg:w-24 lg:px-3">
+          <div className="skeleton-block h-2 w-6 rounded-full" />
+          <div className="mt-2 skeleton-block h-4 w-14 rounded-full" />
+        </div>
+      </div>
+
+      <div className="mt-3 flex items-center gap-2">
+        <div className="skeleton-block h-3.5 w-3.5 rounded-full" />
+        <div className="skeleton-block h-3 w-20 rounded-full" />
+      </div>
+    </div>
+  );
+}
+
+function ServicesLoadingState() {
+  return (
+    <div className="animate-step-enter space-y-3 pb-1">
+      <div className="loading-sheen overflow-hidden rounded-[24px] border border-[#ead8c6] bg-[linear-gradient(135deg,_#fffaf5_0%,_#fff5ea_55%,_#fffaf5_100%)] p-4 shadow-[0_18px_45px_rgba(199,153,99,0.12)]">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8c6b4a]">
+          Aktualizujemy ofertę
+        </p>
+        <div className="mt-2 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#8c6b4a]/10 text-[#8c6b4a]">
+            <Sparkles className="h-5 w-5 animate-[pulse_2.2s_ease-in-out_infinite]" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-stone-900">
+              Ładujemy usługi z bazy danych
+            </p>
+            <p className="mt-0.5 text-xs leading-5 text-stone-600">
+              Zaraz pokażemy aktualny cennik i dostępne zabiegi.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-2.5 pb-1 lg:grid lg:grid-cols-2 lg:gap-2.5 lg:space-y-0">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <ServiceCardSkeleton key={index} index={index} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 const weekDayFormatter = new Intl.DateTimeFormat("pl-PL", { weekday: "short" });
 const dayFormatter = new Intl.DateTimeFormat("pl-PL", { day: "2-digit" });
 const monthShortFormatter = new Intl.DateTimeFormat("pl-PL", { month: "short" });
@@ -1192,14 +1251,7 @@ export default function Page() {
                 )}
               >
                 {isServicesLoading ? (
-                  <div className="space-y-2.5 pb-1 lg:grid lg:grid-cols-2 lg:gap-2.5 lg:space-y-0">
-                    {Array.from({ length: 6 }).map((_, index) => (
-                      <div
-                        key={index}
-                        className="h-[134px] animate-pulse rounded-[24px] border border-stone-200 bg-[linear-gradient(180deg,_#fffdfa_0%,_#fff8f2_100%)]"
-                      />
-                    ))}
-                  </div>
+                  <ServicesLoadingState />
                 ) : servicesError ? (
                   <div className="rounded-[24px] border border-red-200 bg-red-50 px-4 py-5 text-sm text-red-700">
                     {servicesError}
