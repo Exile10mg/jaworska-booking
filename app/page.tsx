@@ -239,9 +239,9 @@ function getTimeSlotsByPeriod(slots: string[], period: TimePeriod) {
   return slots.filter((time) => {
     const minutes = getMinutesFromTime(time);
 
-    if (period === "morning") return minutes >= 8 * 60 && minutes < 12 * 60;
-    if (period === "afternoon") return minutes >= 12 * 60 && minutes < 16 * 60;
-    return minutes >= 16 * 60 && minutes <= 18 * 60;
+    if (period === "morning") return minutes < 12 * 60;
+    if (period === "afternoon") return minutes >= 12 * 60 && minutes < 17 * 60;
+    return minutes >= 17 * 60;
   });
 }
 
