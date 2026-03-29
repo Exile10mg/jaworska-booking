@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -75,16 +75,16 @@ type BookedSummary = {
 const SERVICES_LOADING_MIN_DURATION_MS = 2400;
 
 const phoneCountries: CountryOption[] = [
-  { iso: "PL", name: "Polska", dialCode: "48", flag: "🇵🇱" },
-  { iso: "DE", name: "Niemcy", dialCode: "49", flag: "🇩🇪" },
-  { iso: "GB", name: "Wielka Brytania", dialCode: "44", flag: "🇬🇧" },
-  { iso: "FR", name: "Francja", dialCode: "33", flag: "🇫🇷" },
-  { iso: "ES", name: "Hiszpania", dialCode: "34", flag: "🇪🇸" },
-  { iso: "IT", name: "Włochy", dialCode: "39", flag: "🇮🇹" },
-  { iso: "UA", name: "Ukraina", dialCode: "380", flag: "🇺🇦" },
-  { iso: "CZ", name: "Czechy", dialCode: "420", flag: "🇨🇿" },
-  { iso: "SK", name: "Słowacja", dialCode: "421", flag: "🇸🇰" },
-  { iso: "US", name: "Stany Zjednoczone", dialCode: "1", flag: "🇺🇸" },
+  { iso: "PL", name: "Polska", dialCode: "48", flag: "đź‡µđź‡±" },
+  { iso: "DE", name: "Niemcy", dialCode: "49", flag: "đź‡©đź‡Ş" },
+  { iso: "GB", name: "Wielka Brytania", dialCode: "44", flag: "đź‡¬đź‡§" },
+  { iso: "FR", name: "Francja", dialCode: "33", flag: "đź‡«đź‡·" },
+  { iso: "ES", name: "Hiszpania", dialCode: "34", flag: "đź‡Şđź‡¸" },
+  { iso: "IT", name: "WĹ‚ochy", dialCode: "39", flag: "đź‡®đź‡ą" },
+  { iso: "UA", name: "Ukraina", dialCode: "380", flag: "đź‡şđź‡¦" },
+  { iso: "CZ", name: "Czechy", dialCode: "420", flag: "đź‡¨đź‡ż" },
+  { iso: "SK", name: "SĹ‚owacja", dialCode: "421", flag: "đź‡¸đź‡°" },
+  { iso: "US", name: "Stany Zjednoczone", dialCode: "1", flag: "đź‡şđź‡¸" },
 ];
 
 function formatPhoneDigits(digits: string) {
@@ -145,10 +145,10 @@ function SuccessStep({ serviceName, dateLabel, time, onReset }: SuccessStepProps
         </div>
 
         <h2 className="mt-5 text-2xl font-bold text-stone-900">
-          Twoja rezerwacja została wysłana!
+          Twoja rezerwacja zostaĹ‚a wysĹ‚ana!
         </h2>
         <p className="mt-2 text-sm text-stone-600">
-          Dziękujemy za zaufanie. Twoja wizyta jest teraz oczekująca i czeka na potwierdzenie.
+          DziÄ™kujemy za zaufanie. Twoja wizyta jest teraz oczekujÄ…ca i czeka na potwierdzenie.
         </p>
 
         <div className="mt-4 flex w-full flex-col items-center gap-1 rounded-2xl bg-white/80 px-4 py-2 text-sm text-stone-700 md:inline-flex md:w-auto md:flex-row md:gap-2">
@@ -169,7 +169,7 @@ function SuccessStep({ serviceName, dateLabel, time, onReset }: SuccessStepProps
                 <MessageSquare className="h-4 w-4" />
               </div>
               <p>
-                Po zapisaniu rezerwacji otrzymasz SMS z informacją, że wizyta oczekuje
+                Po zapisaniu rezerwacji otrzymasz SMS z informacjÄ…, ĹĽe wizyta oczekuje
                 na potwierdzenie.
               </p>
             </div>
@@ -178,7 +178,7 @@ function SuccessStep({ serviceName, dateLabel, time, onReset }: SuccessStepProps
                 <Phone className="h-4 w-4" />
               </div>
               <p>
-                Gdy potwierdzimy termin, wyślemy kolejny SMS z potwierdzeniem wizyty.
+                Gdy potwierdzimy termin, wyĹ›lemy kolejny SMS z potwierdzeniem wizyty.
               </p>
             </div>
             <div className="flex items-start gap-3">
@@ -186,7 +186,7 @@ function SuccessStep({ serviceName, dateLabel, time, onReset }: SuccessStepProps
                 <Bell className="h-4 w-4" />
               </div>
               <p>
-                Jeśli wizyta zostanie anulowana, również otrzymasz osobny SMS z taką informacją.
+                JeĹ›li wizyta zostanie anulowana, rĂłwnieĹĽ otrzymasz osobny SMS z takÄ… informacjÄ….
               </p>
             </div>
           </div>
@@ -197,7 +197,7 @@ function SuccessStep({ serviceName, dateLabel, time, onReset }: SuccessStepProps
           onClick={onReset}
           className="mt-6 flex h-12 w-full items-center justify-center rounded-2xl bg-stone-900 px-4 text-sm font-semibold text-white transition hover:bg-black"
         >
-          Rozumiem, wróć do strony głównej
+          Rozumiem, wrĂłÄ‡ do strony gĹ‚Ăłwnej
         </button>
       </div>
     </div>
@@ -207,7 +207,7 @@ function SuccessStep({ serviceName, dateLabel, time, onReset }: SuccessStepProps
 function ServiceCardSkeleton({ index }: { index: number }) {
   return (
     <div
-      className="loading-sheen animate-card-enter relative overflow-hidden rounded-[24px] border border-stone-200 bg-[linear-gradient(180deg,_#fffdfa_0%,_#fff8f2_100%)] p-3 md:p-4 lg:rounded-[22px] lg:p-3"
+      className="loading-sheen animate-card-enter relative min-h-[132px] overflow-hidden rounded-[24px] border border-stone-200 bg-[linear-gradient(180deg,_#fffdfa_0%,_#fff8f2_100%)] p-3 md:min-h-[134px] md:p-4 lg:rounded-[22px] lg:p-3"
       style={{ animationDelay: `${index * 60}ms` }}
       aria-hidden="true"
     >
@@ -237,7 +237,7 @@ function ServicesLoadingState() {
     <div className="animate-step-enter space-y-3 pb-1">
       <div className="loading-sheen overflow-hidden rounded-[24px] border border-[#ead8c6] bg-[linear-gradient(135deg,_#fffaf5_0%,_#fff5ea_55%,_#fffaf5_100%)] p-4">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8c6b4a]">
-          Aktualizujemy ofertę
+          Aktualizujemy ofertÄ™
         </p>
         <div className="mt-2 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#8c6b4a]/10 text-[#8c6b4a]">
@@ -245,10 +245,10 @@ function ServicesLoadingState() {
           </div>
           <div>
             <p className="text-sm font-semibold text-stone-900">
-              Ładujemy usługi z bazy danych
+              Ĺadujemy usĹ‚ugi z bazy danych
             </p>
             <p className="mt-0.5 text-xs leading-5 text-stone-600">
-              Zaraz pokażemy aktualny cennik i dostępne zabiegi.
+              Zaraz pokaĹĽemy aktualny cennik i dostÄ™pne zabiegi.
             </p>
           </div>
         </div>
@@ -466,8 +466,6 @@ export default function Page() {
   const [visibleMonthLabel, setVisibleMonthLabel] = useState(() =>
     capitalize(monthYearFormatter.format(parseDateKey(todayKey))),
   );
-  const [showMobileStickyCallButton, setShowMobileStickyCallButton] =
-    useState(false);
 
   const selectedService =
     services.find((service) => service.id === selectedServiceId) ?? null;
@@ -511,7 +509,7 @@ export default function Page() {
     "flex items-center gap-2 rounded-full bg-stone-900 px-4 h-10 text-sm font-medium text-white shadow-sm transition-[transform,background-color,color] duration-200 ease-in-out hover:bg-black md:hover:scale-[1.03]";
 
   const stepMeta = [
-    { id: 1, label: "Usługa" },
+    { id: 1, label: "UsĹ‚uga" },
     { id: 2, label: "Termin" },
     { id: 3, label: "Kontakt" },
     { id: 4, label: "Potwierdzenie" },
@@ -716,7 +714,7 @@ export default function Page() {
     if (!selectedDate || !selectedTime) return;
     if (!availableTimeSlots.includes(selectedTime)) {
       setSelectedTime(null);
-      setSubmitError("Wybrany termin nie jest już dostępny. Wybierz nową godzinę.");
+      setSubmitError("Wybrany termin nie jest juĹĽ dostÄ™pny. Wybierz nowÄ… godzinÄ™.");
       setStep(2);
       return;
     }
@@ -813,7 +811,7 @@ export default function Page() {
         });
 
         if (!response.ok) {
-          throw new Error("Nie udało się pobrać usług.");
+          throw new Error("Nie udaĹ‚o siÄ™ pobraÄ‡ usĹ‚ug.");
         }
 
         const data = (await response.json()) as { services?: Service[] };
@@ -825,7 +823,7 @@ export default function Page() {
         if (cancelled) return;
         console.error(error);
         setServices([]);
-        setServicesError("Nie udało się pobrać listy usług. Odśwież stronę.");
+        setServicesError("Nie udaĹ‚o siÄ™ pobraÄ‡ listy usĹ‚ug. OdĹ›wieĹĽ stronÄ™.");
       } finally {
         const elapsed = Date.now() - loadingStartedAt;
         const remaining = Math.max(
@@ -860,7 +858,7 @@ export default function Page() {
         });
 
         if (!response.ok) {
-          throw new Error("Nie udało się pobrać treści dokumentów.");
+          throw new Error("Nie udaĹ‚o siÄ™ pobraÄ‡ treĹ›ci dokumentĂłw.");
         }
 
         const data = (await response.json()) as {
@@ -893,7 +891,7 @@ export default function Page() {
     });
 
     if (!response.ok) {
-      throw new Error("Nie udało się pobrać dostępności.");
+      throw new Error("Nie udaĹ‚o siÄ™ pobraÄ‡ dostÄ™pnoĹ›ci.");
     }
 
     const data = (await response.json()) as {
@@ -916,7 +914,7 @@ export default function Page() {
         });
 
         if (!response.ok) {
-          throw new Error("Nie udało się pobrać dostępności.");
+          throw new Error("Nie udaĹ‚o siÄ™ pobraÄ‡ dostÄ™pnoĹ›ci.");
         }
 
         const data = (await response.json()) as {
@@ -931,7 +929,7 @@ export default function Page() {
         console.error(error);
         setAvailability({});
         setAvailabilityError(
-          "Nie udało się pobrać terminarza. Spróbuj odświeżyć stronę.",
+          "Nie udaĹ‚o siÄ™ pobraÄ‡ terminarza. SprĂłbuj odĹ›wieĹĽyÄ‡ stronÄ™.",
         );
       } finally {
         if (!cancelled) {
@@ -1066,38 +1064,8 @@ export default function Page() {
     };
   }, [isCountryDropdownOpen, updateCountryDropdownPosition]);
 
-  useEffect(() => {
-    const handleScrollVisibility = () => {
-      setShowMobileStickyCallButton(window.scrollY > 140);
-    };
-
-    handleScrollVisibility();
-    window.addEventListener("scroll", handleScrollVisibility, { passive: true });
-
-    return () => {
-      window.removeEventListener("scroll", handleScrollVisibility);
-    };
-  }, []);
-
   return (
     <main className="min-h-[100dvh] bg-[#faf8f5] p-2 text-stone-900 sm:p-4 lg:flex lg:items-center lg:justify-center lg:p-8">
-      <div
-        className={cn(
-          "fixed left-1/2 top-2 z-[70] w-[calc(100%-1rem)] max-w-md -translate-x-1/2 transition-all duration-300 ease-out md:hidden",
-          showMobileStickyCallButton
-            ? "translate-y-0 opacity-100"
-            : "-translate-y-4 opacity-0 pointer-events-none",
-        )}
-      >
-        <a
-          href={`tel:${CONTACT_PHONE_E164}`}
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-stone-900 bg-stone-900 px-4 text-sm font-semibold text-white shadow-[0_16px_40px_rgba(166,130,95,0.14),_0_0_0_8px_rgba(252,250,248,0.92)] backdrop-blur-md transition hover:bg-black"
-        >
-          <Phone className="h-4 w-4 text-white" />
-          Zadzwoń teraz
-        </a>
-      </div>
-
       <div className="mx-auto flex min-h-[100dvh] w-full max-w-md flex-col overflow-hidden rounded-[32px] border border-[#f2e3d3] bg-[#fcfaf8] shadow-[0_30px_90px_rgba(166,130,95,0.18)] backdrop-blur lg:min-h-0 lg:h-[85vh] lg:max-w-5xl">
         <section className="shrink-0 px-4 pb-3 pt-4 md:px-6 md:pb-3 md:pt-4">
           <div className="flex flex-col items-center gap-3 border-b border-[#e5e0d8] pb-4 md:flex-row md:items-start md:justify-between">
@@ -1113,7 +1081,7 @@ export default function Page() {
                   className="inline-flex items-center gap-1.5 transition-colors hover:text-stone-900 md:hidden"
                 >
                   <MapPin className="h-3.5 w-3.5" />
-                  Różana 28/66, 20-538 Lublin
+                  RĂłĹĽana 28/66, 20-538 Lublin
                 </a>
 
                 <div className="mt-1 flex flex-col items-center gap-1 md:hidden">
@@ -1143,7 +1111,7 @@ export default function Page() {
                     className="inline-flex items-center gap-1.5 transition-colors hover:text-stone-900"
                   >
                     <MapPin className="h-3.5 w-3.5" />
-                      Różana 28/66, 20-538 Lublin
+                      RĂłĹĽana 28/66, 20-538 Lublin
                   </a>
                   <span className="text-stone-300">|</span>
                   <a
@@ -1184,7 +1152,7 @@ export default function Page() {
                     className={`${headerSecondaryButtonClass} h-12 w-12 justify-center px-0 text-xs cursor-pointer transition-colors hover:bg-gray-50 md:h-9 md:w-auto md:gap-2 md:px-3.5 md:text-sm`}
                   >
                     <MapPin className="h-5 w-5 text-stone-500 md:h-4 md:w-4" />
-                    <span className="hidden md:inline">Pokaż na mapie</span>
+                    <span className="hidden md:inline">PokaĹĽ na mapie</span>
                   </button>
                 </div>
                 <a
@@ -1192,7 +1160,7 @@ export default function Page() {
                   className={`${headerPrimaryButtonClass} h-10 w-full justify-center px-3.5 text-sm cursor-pointer md:h-9 md:w-auto md:text-sm`}
                 >
                   <Phone className="h-4 w-4 text-white" />
-                  Zadzwoń teraz
+                  ZadzwoĹ„ teraz
                 </a>
               </div>
             </div>
@@ -1269,14 +1237,14 @@ export default function Page() {
                 <h2
                   className="mt-2 text-2xl font-medium text-gray-800"
                 >
-                  {step === 1 && "Wybierz usługę"}
-                  {step === 2 && "Znajdź dogodny termin"}
-                  {step === 3 && "Uzupełnij dane"}
-                  {step === 4 && "Sprawdź podsumowanie"}
+                  {step === 1 && "Wybierz usĹ‚ugÄ™"}
+                  {step === 2 && "ZnajdĹş dogodny termin"}
+                  {step === 3 && "UzupeĹ‚nij dane"}
+                  {step === 4 && "SprawdĹş podsumowanie"}
                 </h2>
                 {step === 1 && (
                   <p className="mt-1 text-sm font-normal text-gray-500">
-                    Zaznacz interesujący Cię zabieg, aby przejść dalej.
+                    Zaznacz interesujÄ…cy CiÄ™ zabieg, aby przejĹ›Ä‡ dalej.
                   </p>
                 )}
               </div>
@@ -1306,7 +1274,7 @@ export default function Page() {
                   </div>
                 ) : services.length === 0 ? (
                   <div className="rounded-[24px] border border-dashed border-stone-200 bg-stone-50 px-4 py-8 text-center text-sm text-stone-500">
-                    Brak aktywnych usług do rezerwacji.
+                    Brak aktywnych usĹ‚ug do rezerwacji.
                   </div>
                 ) : (
                   <div
@@ -1326,7 +1294,7 @@ export default function Page() {
                           type="button"
                           onClick={() => handleSelectService(service.id)}
                           className={cn(
-                            "group relative w-full overflow-hidden rounded-[24px] border p-3 text-left transition-colors duration-200 ease-in-out md:p-4 lg:h-full lg:rounded-[22px] lg:p-3",
+                            "group relative min-h-[132px] w-full overflow-hidden rounded-[24px] border p-3 text-left transition-colors duration-200 ease-in-out md:min-h-[134px] md:p-4 lg:h-full lg:rounded-[22px] lg:p-3",
                             isSelected &&
                               "border-[#8c6b4a] bg-[#8c6b4a]/5",
                             !isSelected &&
@@ -1359,7 +1327,7 @@ export default function Page() {
                                     service.isFixedPrice ? "" : "mt-1",
                                   )}
                                 >
-                                  {service.price} zł
+                                  {service.price} zĹ‚
                                 </p>
                               </div>
                               <span
@@ -1369,7 +1337,7 @@ export default function Page() {
                                     ? "border-stone-900 bg-stone-900 text-white"
                                     : "border-[#e5e0d8] bg-transparent text-transparent",
                                 )}
-                                aria-label={isSelected ? "Wybrano usługę" : "Wybierz usługę"}
+                                aria-label={isSelected ? "Wybrano usĹ‚ugÄ™" : "Wybierz usĹ‚ugÄ™"}
                               >
                                 <Check className="h-3.5 w-3.5" />
                               </span>
@@ -1396,7 +1364,7 @@ export default function Page() {
                   disabled={!selectedServiceId}
                   className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-stone-900 px-4 text-sm font-semibold text-white transition-[transform,background-color,color] duration-200 ease-in-out hover:bg-stone-800 md:hover:scale-[1.01] disabled:cursor-not-allowed disabled:bg-stone-300 disabled:opacity-50"
                 >
-                  Przejdź do terminu
+                  PrzejdĹş do terminu
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
@@ -1408,7 +1376,7 @@ export default function Page() {
               <div className="space-y-2.5 md:space-y-4 lg:space-y-3">
               <div className="rounded-[24px] border border-[#ead8c6] bg-[#fffaf5] p-3 md:p-4">
                 <p className="text-xs uppercase tracking-[0.24em] text-[#9b6f47]">
-                  Wybrana usługa
+                  Wybrana usĹ‚uga
                 </p>
                 <div className="mt-2 flex items-start justify-between gap-2.5 md:gap-3">
                   <div className="min-w-0 flex-1 pr-2">
@@ -1420,7 +1388,7 @@ export default function Page() {
                     </p>
                   </div>
                   <p className="shrink-0 whitespace-nowrap text-base font-semibold text-stone-900 md:text-lg">
-                    {selectedService.price} zł
+                    {selectedService.price} zĹ‚
                   </p>
                 </div>
               </div>
@@ -1437,7 +1405,7 @@ export default function Page() {
                         ? "border-stone-200 text-stone-600 hover:border-stone-300"
                         : "cursor-not-allowed border-stone-100 text-stone-300",
                     )}
-                    aria-label="Przewiń dni w lewo"
+                    aria-label="PrzewiĹ„ dni w lewo"
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </button>
@@ -1453,7 +1421,7 @@ export default function Page() {
                         ? "border-stone-200 text-stone-600 hover:border-stone-300"
                         : "border-stone-200 text-stone-500 hover:border-stone-300",
                     )}
-                    aria-label="Przewiń dni w prawo"
+                    aria-label="PrzewiĹ„ dni w prawo"
                   >
                     <ChevronRight className="h-4 w-4" />
                   </button>
@@ -1526,8 +1494,8 @@ export default function Page() {
                 <div className="mb-3 inline-flex w-full rounded-2xl bg-stone-100 p-1 md:mb-4">
                   {[
                     { id: "morning", label: "Rano" },
-                    { id: "afternoon", label: "Popołudnie" },
-                    { id: "evening", label: "Wieczór" },
+                    { id: "afternoon", label: "PopoĹ‚udnie" },
+                    { id: "evening", label: "WieczĂłr" },
                   ].map((period) => {
                     const isActive = selectedTimePeriod === period.id;
 
@@ -1554,7 +1522,7 @@ export default function Page() {
 
                 {isAvailabilityLoading ? (
                   <div className="flex h-10 items-center justify-center rounded-xl border border-dashed border-stone-300 bg-stone-50 px-3 text-center text-xs text-stone-500">
-                    Ładowanie terminarza...
+                    Ĺadowanie terminarza...
                   </div>
                 ) : availabilityError ? (
                   <div className="flex min-h-10 items-center justify-center rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-center text-xs text-red-700">
@@ -1574,7 +1542,7 @@ export default function Page() {
                             ? "border-stone-200 text-stone-600 hover:border-stone-300"
                             : "pointer-events-none border-stone-100 text-stone-300 opacity-30",
                         )}
-                        aria-label="Przewiń godziny w lewo"
+                        aria-label="PrzewiĹ„ godziny w lewo"
                       >
                         <ChevronLeft className="h-4 w-4" />
                       </button>
@@ -1629,7 +1597,7 @@ export default function Page() {
                             ? "border-stone-200 text-stone-600 hover:border-stone-300"
                             : "pointer-events-none border-stone-100 text-stone-300 opacity-30",
                         )}
-                        aria-label="Przewiń godziny w prawo"
+                        aria-label="PrzewiĹ„ godziny w prawo"
                       >
                         <ChevronRight className="h-4 w-4" />
                       </button>
@@ -1639,12 +1607,12 @@ export default function Page() {
                     <div className="flex h-10 items-center justify-center rounded-xl border border-dashed border-stone-300 bg-stone-50 px-3 text-center text-xs text-stone-500">
                       {availableTimeSlots.length > 0
                         ? "Brak wolnych godzin w tej porze dnia."
-                        : "Brak terminów w tym dniu."}
+                        : "Brak terminĂłw w tym dniu."}
                     </div>
                   )
                 ) : (
                   <div className="flex h-10 items-center justify-center rounded-xl border border-dashed border-stone-300 bg-stone-50 px-3 text-center text-xs text-stone-500">
-                    Najpierw wybierz dzień, aby zobaczyć wolne godziny.
+                    Najpierw wybierz dzieĹ„, aby zobaczyÄ‡ wolne godziny.
                   </div>
                 )}
               </div>
@@ -1665,7 +1633,7 @@ export default function Page() {
                   disabled={!selectedDate || !selectedTime}
                   className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-stone-900 px-4 text-sm font-semibold text-white transition-[transform,background-color,color] duration-200 ease-in-out hover:bg-stone-800 md:hover:scale-[1.01] disabled:cursor-not-allowed disabled:bg-stone-300 disabled:opacity-50"
                 >
-                  Przejdź dalej
+                  PrzejdĹş dalej
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
@@ -1683,7 +1651,7 @@ export default function Page() {
               <div className="space-y-3 lg:space-y-2.5">
                 <div className="rounded-[26px] border border-[#ead8c6] bg-[#fffaf5] p-3.5">
                   <p className="text-xs uppercase tracking-[0.24em] text-[#9b6f47]">
-                    Twój termin
+                    TwĂłj termin
                   </p>
                   <div className="mt-2 space-y-1.5 text-sm text-stone-700">
                     <p className="font-semibold text-stone-900">{selectedService.name}</p>
@@ -1699,7 +1667,7 @@ export default function Page() {
                       className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500"
                     >
                       <UserRound className="h-3.5 w-3.5 text-[#b88659]" />
-                      Imię i nazwisko
+                      ImiÄ™ i nazwisko
                     </label>
                     <input
                       id="booking-name"
@@ -1782,7 +1750,7 @@ export default function Page() {
                     rows={3}
                     value={notes}
                     onChange={(event) => setNotes(event.target.value)}
-                    placeholder="Opcjonalnie: napisz, jeśli chcesz coś doprecyzować"
+                    placeholder="Opcjonalnie: napisz, jeĹ›li chcesz coĹ› doprecyzowaÄ‡"
                     className="h-20 max-h-[100px] w-full resize-none rounded-2xl border border-stone-200 bg-white px-3.5 pb-2.5 pt-3 text-sm outline-none transition-[border-color,box-shadow] duration-200 ease-in-out placeholder:text-stone-400 focus:border-[#c79963] focus:ring-4 focus:ring-[#f4e5d5]"
                   />
                 </div>
@@ -1794,10 +1762,10 @@ export default function Page() {
                     </div>
                     <div>
                       <p className="font-semibold text-stone-900">
-                        Płatność tylko gotówką w salonie
+                        PĹ‚atnoĹ›Ä‡ tylko gotĂłwkÄ… w salonie
                       </p>
                       <p className="mt-0.5 leading-5 text-stone-600">
-                        Rezerwacja nie wymaga przedpłaty ani płatności online.
+                        Rezerwacja nie wymaga przedpĹ‚aty ani pĹ‚atnoĹ›ci online.
                       </p>
                     </div>
                   </div>
@@ -1831,7 +1799,7 @@ export default function Page() {
                     )}
                   />
                   <p className="text-sm leading-6 text-gray-700">
-                    Przeczytałam i akceptuję{" "}
+                    PrzeczytaĹ‚am i akceptujÄ™{" "}
                     <button
                       type="button"
                       onClick={() => openLegalModal("regulamin")}
@@ -1845,15 +1813,15 @@ export default function Page() {
                       onClick={() => openLegalModal("polityka")}
                       className="cursor-pointer font-semibold text-[#8c6b4a] underline transition-colors hover:text-[#6f543a]"
                     >
-                      Politykę Prywatności
+                      PolitykÄ™ PrywatnoĹ›ci
                     </button>{" "}
-                    serwisu. Wiem, że są one niezbędne do realizacji mojej
+                    serwisu. Wiem, ĹĽe sÄ… one niezbÄ™dne do realizacji mojej
                     rezerwacji.
                   </p>
                 </div>
                 {showLegalError && !isLegalAccepted && (
                   <p className="mt-2 pl-10 text-xs font-medium text-red-600">
-                    Aby przejść dalej, zaakceptuj Regulamin i Politykę Prywatności.
+                    Aby przejĹ›Ä‡ dalej, zaakceptuj Regulamin i PolitykÄ™ PrywatnoĹ›ci.
                   </p>
                 )}
               </div>
@@ -1882,7 +1850,7 @@ export default function Page() {
                   }}
                   className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-stone-900 px-4 text-sm font-semibold text-white transition-[transform,background-color,color] duration-200 ease-in-out hover:bg-stone-800 md:hover:scale-[1.01] disabled:cursor-not-allowed disabled:bg-stone-300"
                 >
-                  Przejdź dalej
+                  PrzejdĹş dalej
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
@@ -1902,7 +1870,7 @@ export default function Page() {
                     <div className="rounded-2xl bg-stone-50/90 p-3">
                       <p className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">
                         <CheckCircle2 className="h-3.5 w-3.5 text-[#8c6b4a]" />
-                        Usługa
+                        UsĹ‚uga
                       </p>
                       <p className="mt-1.5 text-base font-semibold leading-5 text-stone-900">
                         {selectedService.name}
@@ -1961,13 +1929,13 @@ export default function Page() {
 
                 <div className="rounded-[24px] border border-[#e6d4bf] border-l-4 border-l-[#8c6b4a] bg-[#fff8f1] p-3.5 text-sm text-stone-700">
                   <p className="font-semibold uppercase tracking-[0.16em] text-stone-500">
-                    Do zapłaty na miejscu
+                    Do zapĹ‚aty na miejscu
                   </p>
                   <p className="mt-1 text-3xl font-bold text-stone-900">
-                    {selectedService.price} zł
+                    {selectedService.price} zĹ‚
                   </p>
                   <p className="mt-1.5 text-xs leading-5 text-stone-600">
-                    Płatność gotówką po wizycie.
+                    PĹ‚atnoĹ›Ä‡ gotĂłwkÄ… po wizycie.
                   </p>
                 </div>
               </div>
@@ -2015,7 +1983,7 @@ export default function Page() {
                           | { error?: string }
                           | null;
                         throw new Error(
-                          payload?.error ?? "Nie udało się zapisać rezerwacji.",
+                          payload?.error ?? "Nie udaĹ‚o siÄ™ zapisaÄ‡ rezerwacji.",
                         );
                       }
 
@@ -2039,7 +2007,7 @@ export default function Page() {
                       console.error(error);
                       if (
                         error instanceof Error &&
-                        error.message === "Wybrany termin nie jest już dostępny."
+                        error.message === "Wybrany termin nie jest juĹĽ dostÄ™pny."
                       ) {
                         try {
                           await loadAvailability();
@@ -2050,7 +2018,7 @@ export default function Page() {
                         setSelectedTime(null);
                         setStep(2);
                         setSubmitError(
-                          "Wybrany termin nie jest już dostępny. Wybierz nową godzinę.",
+                          "Wybrany termin nie jest juĹĽ dostÄ™pny. Wybierz nowÄ… godzinÄ™.",
                         );
                         return;
                       }
@@ -2058,7 +2026,7 @@ export default function Page() {
                       setSubmitError(
                         error instanceof Error
                           ? error.message
-                          : "Nie udało się zapisać rezerwacji. Spróbuj ponownie.",
+                          : "Nie udaĹ‚o siÄ™ zapisaÄ‡ rezerwacji. SprĂłbuj ponownie.",
                       );
                     } finally {
                       setIsSubmitting(false);
@@ -2067,7 +2035,7 @@ export default function Page() {
                   disabled={isSubmitting}
                   className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-stone-900 px-4 text-sm font-semibold text-white transition-all hover:bg-black disabled:cursor-not-allowed disabled:bg-stone-300"
                 >
-                  {isSubmitting ? "Zapisywanie..." : "Potwierdź rezerwację"}
+                  {isSubmitting ? "Zapisywanie..." : "PotwierdĹş rezerwacjÄ™"}
                 </button>
               </div>
 
@@ -2185,7 +2153,7 @@ export default function Page() {
               type="button"
               onClick={() => setIsMapModalOpen(false)}
               className="absolute right-4 top-4 z-10 rounded-full bg-white p-2 shadow-md transition-colors hover:bg-gray-100"
-              aria-label="Zamknij mapę"
+              aria-label="Zamknij mapÄ™"
             >
               <X className="h-4 w-4 text-stone-700" />
             </button>
@@ -2203,3 +2171,4 @@ export default function Page() {
     </main>
   );
 }
+
