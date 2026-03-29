@@ -2,6 +2,10 @@ import "server-only";
 
 import twilio from "twilio";
 
+import {
+  CONTACT_PHONE_DISPLAY,
+} from "@/lib/contact-details";
+
 type BookingSmsPayload = {
   serviceName: string;
   appointmentDate: string;
@@ -50,6 +54,7 @@ function buildBookingSmsBody({
     `${formatBookingDate(appointmentDate)}, godz. ${appointmentTime}.`,
     priceLine,
     "Adres: Różana 28/66, Lublin.",
+    `Kontakt: +48 ${CONTACT_PHONE_DISPLAY}.`,
   ].join(" ");
 }
 

@@ -28,6 +28,10 @@ import {
   defaultLegalDocuments,
   type LegalDocument,
 } from "@/lib/default-legal-documents";
+import {
+  CONTACT_PHONE_DISPLAY,
+  CONTACT_PHONE_E164,
+} from "@/lib/contact-details";
 
 type Service = {
   id: string;
@@ -1009,11 +1013,11 @@ export default function Page() {
 
                 <div className="mt-1 flex flex-col items-center gap-1 md:hidden">
                   <a
-                    href="tel:+48514134207"
+                    href={`tel:${CONTACT_PHONE_E164}`}
                     className="inline-flex items-center gap-1.5 hover:text-stone-900 transition-colors"
                   >
                     <Phone className="h-3.5 w-3.5" />
-                    514 134 207
+                    {CONTACT_PHONE_DISPLAY}
                   </a>
                   <a
                     href="https://www.instagram.com/jaworska_beauty/"
@@ -1038,11 +1042,11 @@ export default function Page() {
                   </a>
                   <span className="text-stone-300">|</span>
                   <a
-                    href="tel:+48514134207"
+                    href={`tel:${CONTACT_PHONE_E164}`}
                     className="inline-flex items-center gap-1.5 hover:text-stone-900 transition-colors"
                   >
                     <Phone className="h-3.5 w-3.5" />
-                    514 134 207
+                    {CONTACT_PHONE_DISPLAY}
                   </a>
                   <span className="text-stone-300">|</span>
                   <a
@@ -1079,7 +1083,7 @@ export default function Page() {
                   </button>
                 </div>
                 <a
-                  href="tel:+48514134207"
+                  href={`tel:${CONTACT_PHONE_E164}`}
                   className={`${headerPrimaryButtonClass} h-10 w-full justify-center px-3.5 text-sm cursor-pointer md:h-9 md:w-auto md:text-sm`}
                 >
                   <Phone className="h-4 w-4 text-white" />

@@ -1,0 +1,2 @@
+export const CONTACT_PHONE_DISPLAY = "575 438 631";
+export const CONTACT_PHONE_E164 = "+48575438631";
