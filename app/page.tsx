@@ -1301,7 +1301,7 @@ export default function Page() {
                     className={cn(
                       "pb-1 lg:flex-1",
                       shouldScrollServices &&
-                        "lg:service-list-scroll lg:overflow-y-auto lg:pr-3 lg:pb-6",
+                        "lg:app-scrollbar lg:service-list-scroll lg:overflow-y-auto lg:pr-3 lg:pb-6",
                     )}
                   >
                     <div className="space-y-2.5 lg:grid lg:grid-cols-2 lg:gap-2 lg:space-y-0">
