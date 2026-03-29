@@ -235,7 +235,7 @@ function ServiceCardSkeleton({ index }: { index: number }) {
 function ServicesLoadingState() {
   return (
     <div className="animate-step-enter space-y-3 pb-1">
-      <div className="loading-sheen overflow-hidden rounded-[24px] border border-[#ead8c6] bg-[linear-gradient(135deg,_#fffaf5_0%,_#fff5ea_55%,_#fffaf5_100%)] p-4 shadow-[0_18px_45px_rgba(199,153,99,0.12)]">
+      <div className="loading-sheen overflow-hidden rounded-[24px] border border-[#ead8c6] bg-[linear-gradient(135deg,_#fffaf5_0%,_#fff5ea_55%,_#fffaf5_100%)] p-4">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8c6b4a]">
           Aktualizujemy ofertę
         </p>
