@@ -430,6 +430,7 @@ export default function Page() {
     availableTimeSlots,
     selectedTimePeriod,
   );
+  const shouldScrollServices = services.length > 6;
   const contactReady = name.trim().length > 1 && phone.length >= 6;
   const headerSecondaryButtonClass =
     "flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 h-10 text-sm font-medium text-gray-700 shadow-sm transition-[transform,background-color,color] duration-200 ease-in-out md:hover:scale-[1.03]";
@@ -1048,7 +1049,7 @@ export default function Page() {
 
           {step === 1 && (
             <div className="animate-step-enter flex h-full min-h-0 flex-col">
-              <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+              <div className="min-h-0 flex-1">
                 {isServicesLoading ? (
                   <div className="space-y-2.5 pb-1 lg:grid lg:grid-cols-2 lg:gap-2.5 lg:space-y-0">
                     {Array.from({ length: 6 }).map((_, index) => (
@@ -1067,7 +1068,14 @@ export default function Page() {
                     Brak aktywnych usług do rezerwacji.
                   </div>
                 ) : (
-                  <div className="space-y-2.5 pb-1 lg:grid lg:grid-cols-2 lg:gap-2.5 lg:space-y-0">
+                  <div
+                    className={cn(
+                      "pb-1",
+                      shouldScrollServices &&
+                        "max-h-[min(58vh,38rem)] overflow-y-auto pr-1",
+                    )}
+                  >
+                    <div className="space-y-2.5 lg:grid lg:grid-cols-2 lg:gap-2.5 lg:space-y-0">
                     {services.map((service) => {
                       const isSelected = service.id === selectedServiceId;
 
@@ -1136,6 +1144,7 @@ export default function Page() {
                         </button>
                       );
                     })}
+                    </div>
                   </div>
                 )}
               </div>
