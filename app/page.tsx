@@ -2128,7 +2128,7 @@ export default function Page() {
               className="h-10 w-full rounded-xl border border-stone-200 bg-white px-3 text-sm text-stone-700 outline-none focus:border-[#8c6b4a] focus:ring-2 focus:ring-[#f4e5d5]"
             />
             <div
-              className="mt-2 overflow-y-auto"
+              className="app-scrollbar-thin mt-2 overflow-y-auto pr-1"
               style={{ maxHeight: Math.max(140, countryDropdownPosition.maxHeight - 52) }}
             >
               {filteredCountries.map((country) => (
@@ -2179,7 +2179,7 @@ export default function Page() {
               {activeLegalDocument?.title ?? ""}
             </h2>
 
-            <div className="mt-4 flex-1 overflow-y-auto pr-1 text-sm leading-6 text-stone-700">
+            <div className="app-scrollbar mt-4 flex-1 overflow-y-auto pr-2 text-sm leading-6 text-stone-700">
               <div className="whitespace-pre-wrap">
                 {activeLegalDocument?.content ?? ""}
               </div>
