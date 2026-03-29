@@ -35,11 +35,10 @@ function formatBookingDate(date: string) {
   }).format(new Date(`${date}T12:00:00`));
 }
 
-function buildBookingSmsBody({
+function buildBaseDetails({
   serviceName,
   appointmentDate,
   appointmentTime,
-  customerName,
   price,
 }: BookingSmsPayload) {
   const priceLine =
@@ -48,17 +47,15 @@ function buildBookingSmsBody({
       : "Kwota do zapłaty zgodnie z cennikiem salonu.";
 
   return [
-    `Jaworska Beauty: Dziękujemy ${customerName}!`,
-    "Twoja rezerwacja została przyjęta.",
     serviceName,
     `${formatBookingDate(appointmentDate)}, godz. ${appointmentTime}.`,
     priceLine,
     "Adres: Różana 28/66, Lublin.",
     `Kontakt: +48 ${CONTACT_PHONE_DISPLAY}.`,
-  ].join(" ");
+  ];
 }
 
-export async function sendBookingConfirmationSms(payload: BookingSmsPayload) {
+async function sendSms(toPhone: string, body: string) {
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
   const authToken = process.env.TWILIO_AUTH_TOKEN;
   const fromNumber = process.env.TWILIO_FROM_NUMBER;
@@ -76,20 +73,48 @@ export async function sendBookingConfirmationSms(payload: BookingSmsPayload) {
     return;
   }
 
-  const to = normalizePhoneToE164(payload.customerPhone);
+  const to = normalizePhoneToE164(toPhone);
 
   if (!to) {
-    console.warn("SMS skipped: invalid customer phone.", payload.customerPhone);
+    console.warn("SMS skipped: invalid customer phone.", toPhone);
     return;
   }
 
   const client = twilio(accountSid, authToken);
 
   await client.messages.create({
-    body: buildBookingSmsBody(payload),
+    body,
     to,
     ...(messagingServiceSid
       ? { messagingServiceSid }
       : { from: fromNumber as string }),
   });
+}
+
+export async function sendBookingPendingSms(payload: BookingSmsPayload) {
+  const body = [
+    `Jaworska Beauty: Dziękujemy ${payload.customerName}!`,
+    "Twoja wizyta jest oczekująca i czeka na potwierdzenie.",
+    ...buildBaseDetails(payload),
+  ].join(" ");
+
+  await sendSms(payload.customerPhone, body);
+}
+
+export async function sendBookingConfirmedSms(payload: BookingSmsPayload) {
+  const body = [
+    `Jaworska Beauty: ${payload.customerName}, Twoja wizyta została potwierdzona.`,
+    ...buildBaseDetails(payload),
+  ].join(" ");
+
+  await sendSms(payload.customerPhone, body);
+}
+
+export async function sendBookingCancelledSms(payload: BookingSmsPayload) {
+  const body = [
+    `Jaworska Beauty: ${payload.customerName}, Twoja wizyta została anulowana.`,
+    ...buildBaseDetails(payload),
+  ].join(" ");
+
+  await sendSms(payload.customerPhone, body);
 }

@@ -146,7 +146,7 @@ function SuccessStep({ serviceName, dateLabel, time, onReset }: SuccessStepProps
           Twoja rezerwacja została wysłana!
         </h2>
         <p className="mt-2 text-sm text-stone-600">
-          Dziękujemy za zaufanie. Po zapisaniu wysyłamy SMS z podsumowaniem wizyty.
+          Dziękujemy za zaufanie. Twoja wizyta jest teraz oczekująca i czeka na potwierdzenie.
         </p>
 
         <div className="mt-4 flex w-full flex-col items-center gap-1 rounded-2xl bg-white/80 px-4 py-2 text-sm text-stone-700 md:inline-flex md:w-auto md:flex-row md:gap-2">
@@ -167,7 +167,8 @@ function SuccessStep({ serviceName, dateLabel, time, onReset }: SuccessStepProps
                 <MessageSquare className="h-4 w-4" />
               </div>
               <p>
-                Po zapisaniu rezerwacji otrzymasz SMS z potwierdzeniem i szczegółami wizyty.
+                Po zapisaniu rezerwacji otrzymasz SMS z informacją, że wizyta oczekuje
+                na potwierdzenie.
               </p>
             </div>
             <div className="flex items-start gap-3">
@@ -175,8 +176,7 @@ function SuccessStep({ serviceName, dateLabel, time, onReset }: SuccessStepProps
                 <Phone className="h-4 w-4" />
               </div>
               <p>
-                Jeśli będziemy potrzebowali doprecyzować rezerwację, skontaktujemy się
-                z Tobą telefonicznie.
+                Gdy potwierdzimy termin, wyślemy kolejny SMS z potwierdzeniem wizyty.
               </p>
             </div>
             <div className="flex items-start gap-3">
@@ -184,8 +184,7 @@ function SuccessStep({ serviceName, dateLabel, time, onReset }: SuccessStepProps
                 <Bell className="h-4 w-4" />
               </div>
               <p>
-                Zachowaj wiadomość SMS, bo znajdziesz tam najważniejsze dane potrzebne
-                przed wizytą.
+                Jeśli wizyta zostanie anulowana, również otrzymasz osobny SMS z taką informacją.
               </p>
             </div>
           </div>

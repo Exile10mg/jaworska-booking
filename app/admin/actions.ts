@@ -27,6 +27,10 @@ import {
   normalizeTimeValue,
 } from "@/lib/availability";
 import {
+  sendBookingCancelledSms,
+  sendBookingConfirmedSms,
+} from "@/lib/sms-notifications";
+import {
   legalDocumentKeys,
   type LegalDocumentKey,
 } from "@/lib/default-legal-documents";
@@ -166,8 +170,12 @@ export async function updateBookingStatusAction(formData: FormData) {
   const [currentBooking] = await db
     .select({
       id: bookings.id,
+      serviceName: bookings.serviceName,
       appointmentDate: bookings.appointmentDate,
       appointmentTime: bookings.appointmentTime,
+      customerName: bookings.customerName,
+      customerPhone: bookings.customerPhone,
+      price: bookings.price,
       status: bookings.status,
     })
     .from(bookings)
@@ -216,6 +224,34 @@ export async function updateBookingStatusAction(formData: FormData) {
     }
   }
 
+  if (currentBooking.status !== status) {
+    try {
+      if (status === "confirmed") {
+        await sendBookingConfirmedSms({
+          serviceName: currentBooking.serviceName,
+          appointmentDate: currentBooking.appointmentDate,
+          appointmentTime: currentBooking.appointmentTime,
+          customerName: currentBooking.customerName,
+          customerPhone: currentBooking.customerPhone,
+          price: currentBooking.price,
+        });
+      }
+
+      if (status === "cancelled") {
+        await sendBookingCancelledSms({
+          serviceName: currentBooking.serviceName,
+          appointmentDate: currentBooking.appointmentDate,
+          appointmentTime: currentBooking.appointmentTime,
+          customerName: currentBooking.customerName,
+          customerPhone: currentBooking.customerPhone,
+          price: currentBooking.price,
+        });
+      }
+    } catch (notificationError) {
+      console.error("Booking status SMS notification error:", notificationError);
+    }
+  }
+
   revalidatePath("/admin");
   revalidatePath("/admin/rezerwacje");
   revalidatePath("/admin/terminarz");
@@ -245,8 +281,12 @@ export async function deleteBookingAction(
       .where(eq(bookings.id, bookingId))
       .returning({
         id: bookings.id,
+        serviceName: bookings.serviceName,
         appointmentDate: bookings.appointmentDate,
         appointmentTime: bookings.appointmentTime,
+        customerName: bookings.customerName,
+        customerPhone: bookings.customerPhone,
+        price: bookings.price,
       });
 
     if (!deletedBooking) {
@@ -269,6 +309,19 @@ export async function deleteBookingAction(
           slotTime: deletedBooking.appointmentTime,
         })
         .onConflictDoNothing();
+    }
+
+    try {
+      await sendBookingCancelledSms({
+        serviceName: deletedBooking.serviceName,
+        appointmentDate: deletedBooking.appointmentDate,
+        appointmentTime: deletedBooking.appointmentTime,
+        customerName: deletedBooking.customerName,
+        customerPhone: deletedBooking.customerPhone,
+        price: deletedBooking.price,
+      });
+    } catch (notificationError) {
+      console.error("Booking deletion SMS notification error:", notificationError);
     }
 
     revalidatePath("/admin");

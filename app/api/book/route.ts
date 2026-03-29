@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/db/client";
 import { availabilitySlots, bookings } from "@/db/schema";
 import { normalizeDateKey, normalizeTimeValue } from "@/lib/availability";
-import { sendBookingConfirmationSms } from "@/lib/sms-notifications";
+import { sendBookingPendingSms } from "@/lib/sms-notifications";
 
 type BookingPayload = {
   serviceId?: string;
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
         });
 
       try {
-        await sendBookingConfirmationSms({
+        await sendBookingPendingSms({
           serviceName: bookingRecord.serviceName,
           appointmentDate: bookingRecord.date,
           appointmentTime: bookingRecord.time,
