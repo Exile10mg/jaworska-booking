@@ -87,6 +87,12 @@ const phoneCountries: CountryOption[] = [
   { iso: "US", name: "Stany Zjednoczone", dialCode: "1", flag: "🇺🇸" },
 ];
 
+const bottomSecondaryButtonClass =
+  "inline-flex h-14 min-w-[120px] shrink-0 items-center justify-center gap-2 rounded-2xl border border-stone-200 bg-white px-5 text-sm font-medium text-stone-700 transition-[transform,background-color,color] duration-200 ease-in-out hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-50 md:px-6 md:hover:scale-[1.01]";
+
+const bottomPrimaryButtonClass =
+  "flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-stone-900 px-5 text-sm font-semibold text-white transition-[transform,background-color,color] duration-200 ease-in-out hover:bg-stone-800 disabled:cursor-not-allowed disabled:bg-stone-300 disabled:opacity-50 md:hover:scale-[1.01]";
+
 function formatPhoneDigits(digits: string) {
   const cleanDigits = digits.replace(/\D/g, "").slice(0, 12);
   const chunks = cleanDigits.match(/.{1,3}/g) ?? [];
@@ -1333,7 +1339,7 @@ export default function Page() {
                   type="button"
                   onClick={() => selectedServiceId && setStep(2)}
                   disabled={!selectedServiceId}
-                  className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-stone-900 px-4 text-sm font-semibold text-white transition-[transform,background-color,color] duration-200 ease-in-out hover:bg-stone-800 md:hover:scale-[1.01] disabled:cursor-not-allowed disabled:bg-stone-300 disabled:opacity-50"
+                  className={bottomPrimaryButtonClass}
                 >
                   Przejdź do terminu
                   <ArrowRight className="h-4 w-4" />
@@ -1593,18 +1599,18 @@ export default function Page() {
                 <button
                   type="button"
                   onClick={goBack}
-                  className="inline-flex h-14 w-14 shrink-0 items-center justify-center gap-2 rounded-2xl border border-stone-200 bg-white text-sm font-medium text-stone-700 transition-[transform,background-color,color] duration-200 ease-in-out hover:bg-stone-50 md:w-auto md:px-6 md:hover:scale-[1.01]"
+                  className={bottomSecondaryButtonClass}
                 >
                   <ChevronLeft className="h-4 w-4" />
-                  <span className="hidden md:inline">Wstecz</span>
+                  <span>Wstecz</span>
                 </button>
                 <button
                   type="button"
                   onClick={handleContinueToContact}
                   disabled={!selectedDate || !selectedTime}
-                  className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-stone-900 px-4 text-sm font-semibold text-white transition-[transform,background-color,color] duration-200 ease-in-out hover:bg-stone-800 md:hover:scale-[1.01] disabled:cursor-not-allowed disabled:bg-stone-300 disabled:opacity-50"
+                  className={bottomPrimaryButtonClass}
                 >
-                  Przejdź dalej
+                  Przejdź do uzupełnienia danych
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
@@ -1801,10 +1807,10 @@ export default function Page() {
                 <button
                   type="button"
                   onClick={goBack}
-                  className="inline-flex h-14 w-14 shrink-0 items-center justify-center gap-2 rounded-2xl border border-stone-200 bg-white text-sm font-medium text-stone-700 transition-[transform,background-color,color] duration-200 ease-in-out hover:bg-stone-50 md:w-auto md:px-6 md:hover:scale-[1.01]"
+                  className={bottomSecondaryButtonClass}
                 >
                   <ChevronLeft className="h-4 w-4" />
-                  <span className="hidden md:inline">Wstecz</span>
+                  <span>Wstecz</span>
                 </button>
                 <button
                   type="button"
@@ -1819,9 +1825,9 @@ export default function Page() {
                     setSubmitError(null);
                     setStep(4);
                   }}
-                  className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-stone-900 px-4 text-sm font-semibold text-white transition-[transform,background-color,color] duration-200 ease-in-out hover:bg-stone-800 md:hover:scale-[1.01] disabled:cursor-not-allowed disabled:bg-stone-300"
+                  className={bottomPrimaryButtonClass}
                 >
-                  Przejdź dalej
+                  Przejdź do podsumowania
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
@@ -1916,10 +1922,10 @@ export default function Page() {
                   type="button"
                   onClick={goBack}
                   disabled={isSubmitting}
-                  className="inline-flex h-14 w-14 shrink-0 items-center justify-center gap-2 rounded-2xl border border-stone-200 bg-white text-sm font-medium text-stone-700 transition-[transform,background-color,color] duration-200 ease-in-out hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-50 md:w-auto md:px-6 md:hover:scale-[1.01]"
+                  className={bottomSecondaryButtonClass}
                 >
                   <ChevronLeft className="h-4 w-4" />
-                  <span className="hidden md:inline">Wstecz</span>
+                  <span>Wstecz</span>
                 </button>
                 <button
                   type="button"
@@ -2004,7 +2010,7 @@ export default function Page() {
                     }
                   }}
                   disabled={isSubmitting}
-                  className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-stone-900 px-4 text-sm font-semibold text-white transition-all hover:bg-black disabled:cursor-not-allowed disabled:bg-stone-300"
+                  className={bottomPrimaryButtonClass}
                 >
                   {isSubmitting ? "Zapisywanie..." : "Potwierdź rezerwację"}
                 </button>
