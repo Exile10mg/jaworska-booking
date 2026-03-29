@@ -38,6 +38,14 @@ export function AdminNav() {
       >
         Terminarz
       </Link>
+      <Link
+        href="/admin/dokumenty"
+        className={`inline-flex h-11 items-center justify-center rounded-2xl border px-5 text-sm font-medium transition ${navClass(
+          pathname.startsWith("/admin/dokumenty"),
+        )}`}
+      >
+        Polityka i regulamin
+      </Link>
     </nav>
   );
 }

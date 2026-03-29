@@ -25,6 +25,11 @@ import {
   X,
 } from "lucide-react";
 
+import {
+  defaultLegalDocuments,
+  type LegalDocument,
+} from "@/lib/default-legal-documents";
+
 type Service = {
   id: string;
   name: string;
@@ -38,6 +43,7 @@ type AvailabilityMap = Record<string, string[]>;
 
 type TimePeriod = "morning" | "afternoon" | "evening";
 type LegalModalContent = "regulamin" | "polityka" | null;
+type LegalDocumentsMap = Record<Exclude<LegalModalContent, null>, LegalDocument>;
 type CountryOption = {
   iso: string;
   name: string;
@@ -389,6 +395,8 @@ export default function Page() {
   const [showLegalError, setShowLegalError] = useState(false);
   const [legalModalContent, setLegalModalContent] =
     useState<LegalModalContent>(null);
+  const [legalDocuments, setLegalDocuments] =
+    useState<LegalDocumentsMap>(defaultLegalDocuments);
   const [canScrollDaysLeft, setCanScrollDaysLeft] = useState(false);
   const [canScrollDaysRight, setCanScrollDaysRight] = useState(false);
   const [isDraggingDays, setIsDraggingDays] = useState(false);
@@ -430,6 +438,9 @@ export default function Page() {
     availableTimeSlots,
     selectedTimePeriod,
   );
+  const activeLegalDocument = legalModalContent
+    ? legalDocuments[legalModalContent]
+    : null;
   const shouldScrollServices = services.length > 6;
   const contactReady = name.trim().length > 1 && phone.length >= 6;
   const headerSecondaryButtonClass =
@@ -759,6 +770,43 @@ export default function Page() {
     }
 
     void loadServices();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadLegalDocuments() {
+      try {
+        const response = await fetch("/api/legal-documents", {
+          cache: "no-store",
+        });
+
+        if (!response.ok) {
+          throw new Error("Nie udało się pobrać treści dokumentów.");
+        }
+
+        const data = (await response.json()) as {
+          documents?: Partial<LegalDocumentsMap>;
+        };
+
+        if (cancelled || !data.documents) return;
+
+        setLegalDocuments({
+          regulamin: data.documents.regulamin ?? defaultLegalDocuments.regulamin,
+          polityka: data.documents.polityka ?? defaultLegalDocuments.polityka,
+        });
+      } catch (error) {
+        if (cancelled) return;
+        console.error(error);
+        setLegalDocuments(defaultLegalDocuments);
+      }
+    }
+
+    void loadLegalDocuments();
 
     return () => {
       cancelled = true;
@@ -2014,53 +2062,13 @@ export default function Page() {
             </button>
 
             <h2 className="pr-10 text-2xl font-semibold text-stone-900">
-              {legalModalContent === "regulamin"
-                ? "Regulamin serwisu"
-                : "Polityka Prywatności"}
+              {activeLegalDocument?.title ?? ""}
             </h2>
 
             <div className="mt-4 flex-1 overflow-y-auto pr-1 text-sm leading-6 text-stone-700">
-              {legalModalContent === "regulamin" ? (
-                <div className="space-y-4">
-                  <p>
-                    Korzystanie z formularza rezerwacji oznacza akceptację zasad
-                    świadczenia usług przez Jaworska Beauty.
-                  </p>
-                  <p>
-                    Rezerwacja terminu jest bezpłatna i dotyczy wizyty realizowanej
-                    stacjonarnie. Płatność odbywa się wyłącznie gotówką po wykonaniu
-                    usługi.
-                  </p>
-                  <p>
-                    W przypadku opóźnienia lub rezygnacji prosimy o kontakt telefoniczny
-                    tak szybko, jak to możliwe.
-                  </p>
-                  <p>
-                    Salon zastrzega sobie prawo do zmiany terminu z przyczyn losowych po
-                    wcześniejszym kontakcie z klientką.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <p>
-                    Administratorem danych osobowych jest Jaworska Beauty. Dane podane w
-                    formularzu są wykorzystywane wyłącznie do obsługi rezerwacji.
-                  </p>
-                  <p>
-                    Przetwarzane dane obejmują: imię, numer telefonu oraz opcjonalne
-                    uwagi dotyczące wizyty.
-                  </p>
-                  <p>
-                    Dane nie są sprzedawane podmiotom trzecim i są przechowywane tylko
-                    przez okres niezbędny do realizacji usługi oraz kontaktu po
-                    rezerwacji.
-                  </p>
-                  <p>
-                    W każdej chwili można poprosić o aktualizację lub usunięcie danych,
-                    kontaktując się telefonicznie z salonem.
-                  </p>
-                </div>
-              )}
+              <div className="whitespace-pre-wrap">
+                {activeLegalDocument?.content ?? ""}
+              </div>
             </div>
           </div>
         </div>

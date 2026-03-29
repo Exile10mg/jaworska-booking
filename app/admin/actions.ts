@@ -11,6 +11,7 @@ import {
   adminUsers,
   availabilitySlots,
   bookings,
+  legalDocuments,
   services,
   type BookingStatus,
 } from "@/db/schema";
@@ -25,6 +26,10 @@ import {
   normalizeDateKey,
   normalizeTimeValue,
 } from "@/lib/availability";
+import {
+  legalDocumentKeys,
+  type LegalDocumentKey,
+} from "@/lib/default-legal-documents";
 
 const allowedBookingStatuses = new Set<BookingStatus>([
   "pending",
@@ -640,6 +645,76 @@ export async function deleteAvailabilityDayAction(
     return {
       status: "error",
       message: "Nie udało się usunąć dnia z terminarza.",
+    };
+  }
+}
+
+export async function updateLegalDocumentAction(
+  _prevState: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  await requireAuthenticatedAdmin();
+
+  const rawKey = formData.get("key");
+  const rawTitle = formData.get("title");
+  const rawContent = formData.get("content");
+  const key = typeof rawKey === "string" ? rawKey : "";
+  const title = typeof rawTitle === "string" ? rawTitle.trim() : "";
+  const content = typeof rawContent === "string" ? rawContent.trim() : "";
+
+  if (!legalDocumentKeys.includes(key as LegalDocumentKey)) {
+    return {
+      status: "error",
+      message: "Nie znaleziono dokumentu do zapisania.",
+    };
+  }
+
+  if (!title) {
+    return {
+      status: "error",
+      message: "Podaj tytuł dokumentu.",
+    };
+  }
+
+  if (!content) {
+    return {
+      status: "error",
+      message: "Wklej treść dokumentu.",
+    };
+  }
+
+  try {
+    const db = getDb();
+    await db
+      .insert(legalDocuments)
+      .values({
+        key,
+        title,
+        content,
+      })
+      .onConflictDoUpdate({
+        target: legalDocuments.key,
+        set: {
+          title,
+          content,
+          updatedAt: new Date(),
+        },
+      });
+
+    revalidatePath("/admin");
+    revalidatePath("/admin/dokumenty");
+    revalidatePath("/");
+
+    return {
+      status: "success",
+      message: "Treść dokumentu została zapisana.",
+    };
+  } catch (error) {
+    console.error("Update legal document action error:", error);
+
+    return {
+      status: "error",
+      message: "Nie udało się zapisać dokumentu. Spróbuj ponownie.",
     };
   }
 }

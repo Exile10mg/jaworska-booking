@@ -116,3 +116,22 @@ export const availabilitySlots = pgTable(
     index("availability_slots_created_at_idx").on(table.createdAt),
   ],
 );
+
+export const legalDocuments = pgTable(
+  "legal_documents",
+  {
+    key: varchar("key", { length: 40 }).primaryKey(),
+    title: text("title").notNull(),
+    content: text("content").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("legal_documents_updated_at_idx").on(table.updatedAt),
+    index("legal_documents_created_at_idx").on(table.createdAt),
+  ],
+);
