@@ -1401,7 +1401,7 @@ export default function Page() {
           )}
 
           {step === 2 && selectedService && (
-            <div className="animate-step-enter flex h-full min-h-0 flex-col">
+            <div className="animate-step-enter flex h-full min-h-0 flex-1 flex-col">
               <div className="flex flex-1 flex-col gap-2.5 md:gap-4 lg:min-h-0 lg:gap-3">
               <div className="rounded-[24px] border border-[#ead8c6] bg-[#fffaf5] p-3 md:p-4">
                 <p className="text-xs uppercase tracking-[0.24em] text-[#9b6f47]">
@@ -1672,7 +1672,7 @@ export default function Page() {
           )}
 
           {step === 3 && selectedService && selectedDay && selectedTime && (
-            <div className="animate-step-enter flex h-full flex-col">
+            <div className="animate-step-enter flex h-full min-h-0 flex-1 flex-col">
               <div className="space-y-3 lg:space-y-2.5">
                 <div className="rounded-[26px] border border-[#ead8c6] bg-[#fffaf5] p-3.5">
                   <p className="text-xs uppercase tracking-[0.24em] text-[#9b6f47]">
@@ -1884,7 +1884,7 @@ export default function Page() {
           )}
 
           {step === 4 && !isBooked && selectedService && selectedDay && selectedTime && (
-            <div className="animate-step-enter flex h-full flex-col">
+            <div className="animate-step-enter flex h-full min-h-0 flex-1 flex-col">
               <div className="space-y-2.5 lg:space-y-2">
                 <div className="rounded-[26px] border border-stone-200 bg-white p-3.5 shadow-sm">
                   <p className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.24em] text-stone-500">
