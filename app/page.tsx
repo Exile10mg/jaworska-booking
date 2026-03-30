@@ -78,8 +78,6 @@ type NotificationState = {
   tone: "error" | "success";
 };
 
-const SERVICES_LOADING_MIN_DURATION_MS = 2400;
-
 const phoneCountries: CountryOption[] = [
   { iso: "PL", name: "Polska", dialCode: "48", flag: "🇵🇱" },
   { iso: "DE", name: "Niemcy", dialCode: "49", flag: "🇩🇪" },
@@ -285,6 +283,29 @@ function toDateKey(date: Date) {
 function parseDateKey(dateKey: string) {
   const [year, month, day] = dateKey.split("-").map(Number);
   return new Date(year, month - 1, day, 12, 0, 0, 0);
+}
+
+function toSlotDateTime(dateKey: string, time: string) {
+  const [year, month, day] = dateKey.split("-").map(Number);
+  const [hour, minute] = time.split(":").map(Number);
+
+  return new Date(year, month - 1, day, hour, minute, 0, 0);
+}
+
+function isPastSlot(dateKey: string, time: string, now = new Date()) {
+  return toSlotDateTime(dateKey, time).getTime() <= now.getTime();
+}
+
+function filterPastAvailability(
+  availability: AvailabilityMap,
+  now = new Date(),
+): AvailabilityMap {
+  return Object.fromEntries(
+    Object.entries(availability).map(([dateKey, slots]) => [
+      dateKey,
+      slots.filter((time) => !isPastSlot(dateKey, time, now)),
+    ]),
+  );
 }
 
 function capitalize(text: string) {
@@ -776,8 +797,6 @@ export default function Page() {
     let cancelled = false;
 
     async function loadServices() {
-      const loadingStartedAt = Date.now();
-
       try {
         setIsServicesLoading(true);
         setServicesError(null);
@@ -801,16 +820,6 @@ export default function Page() {
         setServices([]);
         setServicesError("Nie udało się pobrać listy usług. Odśwież stronę.");
       } finally {
-        const elapsed = Date.now() - loadingStartedAt;
-        const remaining = Math.max(
-          0,
-          SERVICES_LOADING_MIN_DURATION_MS - elapsed,
-        );
-
-        if (remaining > 0) {
-          await new Promise((resolve) => setTimeout(resolve, remaining));
-        }
-
         if (!cancelled) {
           setIsServicesLoading(false);
         }
@@ -874,7 +883,7 @@ export default function Page() {
       availability?: AvailabilityMap;
     };
 
-    setAvailability(data.availability ?? {});
+    setAvailability(filterPastAvailability(data.availability ?? {}));
   }, []);
 
   useEffect(() => {
@@ -899,7 +908,7 @@ export default function Page() {
 
         if (cancelled) return;
 
-        setAvailability(data.availability ?? {});
+        setAvailability(filterPastAvailability(data.availability ?? {}));
       } catch (error) {
         if (cancelled) return;
         console.error(error);
