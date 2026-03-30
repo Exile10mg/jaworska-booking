@@ -248,7 +248,7 @@ function ServiceCardSkeleton({ index }: { index: number }) {
 
 function ServicesLoadingState() {
   return (
-    <div className="animate-step-enter space-y-3 pb-1">
+    <div className="animate-step-enter flex flex-1 flex-col space-y-3 pb-1">
       <div className="space-y-2.5 pb-1 lg:grid lg:grid-cols-2 lg:gap-2.5 lg:space-y-0">
         {Array.from({ length: 6 }).map((_, index) => (
           <ServiceCardSkeleton key={index} index={index} />
@@ -1292,7 +1292,7 @@ export default function Page() {
 
           {step === 1 && (
             <div
-              className="animate-step-enter flex flex-col lg:h-full lg:min-h-0"
+              className="animate-step-enter flex h-full min-h-0 flex-1 flex-col"
             >
               <div className="lg:flex lg:min-h-0 lg:flex-1 lg:flex-col lg:overflow-hidden">
                 {isServicesLoading ? (
