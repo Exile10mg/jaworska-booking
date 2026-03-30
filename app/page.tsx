@@ -1336,7 +1336,7 @@ export default function Page() {
                               <h3 className="text-[13px] font-semibold leading-5 text-stone-900 lg:text-[12.5px] lg:leading-[1.35]">
                                 {service.name}
                               </h3>
-                              <p className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-stone-600 md:line-clamp-3 lg:text-[10.5px]">
+                              <p className="mt-0.5 text-[11px] leading-4 text-stone-600 lg:line-clamp-3 lg:text-[10.5px]">
                                 {service.description}
                               </p>
                             </div>
