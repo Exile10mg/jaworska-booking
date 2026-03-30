@@ -1103,7 +1103,7 @@ export default function Page() {
         </div>
       )}
 
-      <div className="mx-auto flex min-h-[100dvh] w-full max-w-md flex-col overflow-hidden rounded-[32px] border border-[#f2e3d3] bg-[#fcfaf8] shadow-[0_30px_90px_rgba(166,130,95,0.18)] backdrop-blur lg:min-h-0 lg:h-[85vh] lg:max-w-5xl">
+      <div className="mx-auto flex min-h-[100dvh] w-full max-w-md flex-col overflow-hidden rounded-[32px] border border-[#f2e3d3] bg-[#fcfaf8] shadow-[0_30px_90px_rgba(166,130,95,0.18)] backdrop-blur lg:min-h-[calc(100dvh-4rem)] lg:max-h-[calc(100dvh-4rem)] lg:max-w-5xl">
         <section className="shrink-0 px-4 pb-3 pt-4 md:px-6 md:pb-3 md:pt-4">
           <div className="flex flex-col items-center gap-3 border-b border-[#e5e0d8] pb-4 md:flex-row md:items-start md:justify-between">
             <div className="max-w-full text-center md:max-w-[70%] md:text-left">
@@ -1401,8 +1401,8 @@ export default function Page() {
           )}
 
           {step === 2 && selectedService && (
-            <div className="animate-step-enter flex h-full flex-col">
-              <div className="space-y-2.5 md:space-y-4 lg:space-y-3">
+            <div className="animate-step-enter flex h-full min-h-0 flex-col">
+              <div className="flex flex-1 flex-col gap-2.5 md:gap-4 lg:min-h-0 lg:gap-3">
               <div className="rounded-[24px] border border-[#ead8c6] bg-[#fffaf5] p-3 md:p-4">
                 <p className="text-xs uppercase tracking-[0.24em] text-[#9b6f47]">
                   Wybrana usługa
@@ -1515,7 +1515,7 @@ export default function Page() {
                 </div>
               </div>
 
-              <div className="rounded-[24px] border border-[#eadfd3] bg-white/80 p-3 md:p-4">
+              <div className="rounded-[24px] border border-[#eadfd3] bg-white/80 p-3 md:p-4 lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">
                 <div className="mb-3 inline-flex w-full rounded-2xl bg-stone-100 p-1 md:mb-4">
                   {[
                     { id: "morning", label: "Rano" },
@@ -1556,7 +1556,7 @@ export default function Page() {
                 ) : selectedDate ? (
                   filteredTimeSlots.length > 0 ? (
                     <>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 lg:min-h-0 lg:flex-1">
                       <button
                         type="button"
                         onClick={() => handleScrollTimeSlots("left")}
@@ -1574,7 +1574,7 @@ export default function Page() {
                       <div
                         ref={timeSlotsScrollRef}
                         className={cn(
-                          "flex-1 select-none overflow-x-auto overscroll-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden",
+                          "flex-1 select-none overflow-x-auto overscroll-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden lg:min-h-0",
                           isDraggingTimes ? "cursor-grabbing" : "cursor-grab",
                         )}
                         onMouseDown={handleTimeMouseDown}
