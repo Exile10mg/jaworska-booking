@@ -1402,7 +1402,7 @@ export default function Page() {
 
           {step === 2 && selectedService && (
             <div className="animate-step-enter flex h-full min-h-0 flex-1 flex-col">
-              <div className="flex flex-1 flex-col gap-2.5 md:gap-4 lg:min-h-0 lg:gap-3">
+              <div className="space-y-2.5 md:space-y-4 lg:space-y-3">
               <div className="rounded-[24px] border border-[#ead8c6] bg-[#fffaf5] p-3 md:p-4">
                 <p className="text-xs uppercase tracking-[0.24em] text-[#9b6f47]">
                   Wybrana usługa
@@ -1515,7 +1515,7 @@ export default function Page() {
                 </div>
               </div>
 
-              <div className="rounded-[24px] border border-[#eadfd3] bg-white/80 p-3 md:p-4 lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">
+              <div className="rounded-[24px] border border-[#eadfd3] bg-white/80 p-3 md:p-4">
                 <div className="mb-3 inline-flex w-full rounded-2xl bg-stone-100 p-1 md:mb-4">
                   {[
                     { id: "morning", label: "Rano" },
@@ -1556,7 +1556,7 @@ export default function Page() {
                 ) : selectedDate ? (
                   filteredTimeSlots.length > 0 ? (
                     <>
-                      <div className="flex items-center gap-2 lg:min-h-0 lg:flex-1">
+                      <div className="flex items-center gap-2">
                       <button
                         type="button"
                         onClick={() => handleScrollTimeSlots("left")}
@@ -1574,7 +1574,7 @@ export default function Page() {
                       <div
                         ref={timeSlotsScrollRef}
                         className={cn(
-                          "flex-1 select-none overflow-x-auto overscroll-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden lg:min-h-0",
+                          "flex-1 select-none overflow-x-auto overscroll-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden",
                           isDraggingTimes ? "cursor-grabbing" : "cursor-grab",
                         )}
                         onMouseDown={handleTimeMouseDown}
